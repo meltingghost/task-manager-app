@@ -1,41 +1,54 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Theme colors: light/dark with a light-blue (celeste) palette.
+ * TASK_COLORS are used for task color picker in Add task modal.
  */
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+const tintColorLight = '#2E9FD4';
+const tintColorDark = '#87CEEB';
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
+    text: '#0F2D42',
+    background: '#F0F9FF',
     tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
+    icon: '#5EB8E0',
+    tabIconDefault: '#87CEEB',
     tabIconSelected: tintColorLight,
+    card: '#fff',
+    border: '#B8E0F0',
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
+    text: '#E0F4FF',
+    background: '#0D2137',
     tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
+    icon: '#87CEEB',
+    tabIconDefault: '#5EB8E0',
     tabIconSelected: tintColorDark,
+    card: '#152D47',
+    border: '#2E5A7A',
   },
 };
 
+export type TaskColorId = string;
+
+export const TASK_COLORS: { id: string; hex: string }[] = [
+  { id: 'sky', hex: '#87CEEB' },
+  { id: 'aqua', hex: '#5EB8E0' },
+  { id: 'teal', hex: '#2E9FD4' },
+  { id: 'mint', hex: '#7FDBDA' },
+  { id: 'powder', hex: '#B8E0F0' },
+  { id: 'steel', hex: '#4682B4' },
+  { id: 'cyan', hex: '#00BCD4' },
+  { id: 'light', hex: '#E0F4FF' },
+];
+
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: 'ui-monospace',
   },
   default: {

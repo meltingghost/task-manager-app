@@ -11,8 +11,11 @@ import {
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { ThemedText } from '@/components/themed-text';
+import { TASK_COLORS } from '@/constants/theme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import type { Task } from '@/types/task';
+
+const defaultTaskColor = TASK_COLORS[0].hex;
 
 export interface TaskItemProps {
   task: Task;
@@ -31,12 +34,12 @@ function TaskItemComponent({ task, onToggle, onDelete, onUpdate }: TaskItemProps
 
   const handleDeletePress = useCallback(() => {
     Alert.alert(
-      'Eliminar tarea',
-      '¿Estás seguro de que quieres eliminar esta tarea?',
+      'Delete task',
+      'Are you sure you want to delete this task?',
       [
-        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Eliminar',
+          text: 'Delete',
           style: 'destructive',
           onPress: () => {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -65,9 +68,12 @@ function TaskItemComponent({ task, onToggle, onDelete, onUpdate }: TaskItemProps
     onToggle(task.id);
   }, [task.id, onToggle]);
 
+  const taskColor = task.color ?? defaultTaskColor;
+
   if (isEditing && onUpdate) {
     return (
       <View style={styles.row}>
+        <View style={[styles.colorBar, { backgroundColor: taskColor }]} />
         <TextInput
           style={[styles.input, { color: textColor }]}
           value={editValue}
@@ -75,13 +81,13 @@ function TaskItemComponent({ task, onToggle, onDelete, onUpdate }: TaskItemProps
           onSubmitEditing={handleSaveEdit}
           onBlur={handleSaveEdit}
           autoFocus
-          accessibilityLabel="Editar título de la tarea"
+          accessibilityLabel="Edit task title"
           accessibilityRole="none"
         />
         <Pressable
           onPress={handleSaveEdit}
           style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
-          accessibilityLabel="Guardar cambios"
+          accessibilityLabel="Save changes"
           accessibilityRole="button"
         >
           <MaterialIcons name="check" size={24} color={tintColor} />
@@ -89,7 +95,7 @@ function TaskItemComponent({ task, onToggle, onDelete, onUpdate }: TaskItemProps
         <Pressable
           onPress={handleCancelEdit}
           style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
-          accessibilityLabel="Cancelar edición"
+          accessibilityLabel="Cancel edit"
           accessibilityRole="button"
         >
           <MaterialIcons name="close" size={24} color={iconColor} />
@@ -100,10 +106,11 @@ function TaskItemComponent({ task, onToggle, onDelete, onUpdate }: TaskItemProps
 
   return (
     <Animated.View entering={FadeIn.duration(200)} style={styles.row}>
+      <View style={[styles.colorBar, { backgroundColor: taskColor }]} />
       <Pressable
         onPress={handleToggle}
         style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
-        accessibilityLabel={task.completed ? 'Marcar como pendiente' : 'Marcar como completada'}
+        accessibilityLabel={task.completed ? 'Mark as incomplete' : 'Mark as complete'}
         accessibilityRole="button"
       >
         <MaterialIcons
@@ -115,7 +122,7 @@ function TaskItemComponent({ task, onToggle, onDelete, onUpdate }: TaskItemProps
       <Pressable
         style={styles.titleWrap}
         onLongPress={() => onUpdate && setIsEditing(true)}
-        accessibilityLabel={`Tarea: ${task.title}. ${task.completed ? 'Completada.' : 'Pendiente.'}`}
+        accessibilityLabel={`Task: ${task.title}. ${task.completed ? 'Completed.' : 'Pending.'}`}
         accessibilityRole="none"
       >
         <ThemedText
@@ -131,7 +138,7 @@ function TaskItemComponent({ task, onToggle, onDelete, onUpdate }: TaskItemProps
       <Pressable
         onPress={handleDeletePress}
         style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
-        accessibilityLabel="Eliminar tarea"
+        accessibilityLabel="Delete task"
         accessibilityRole="button"
       >
         <MaterialIcons name="delete-outline" size={24} color={iconColor} />
@@ -148,7 +155,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
+    paddingLeft: 12,
     gap: 12,
+  },
+  colorBar: {
+    width: 4,
+    borderRadius: 2,
+    alignSelf: 'stretch',
   },
   iconButton: {
     padding: 4,

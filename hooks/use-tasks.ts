@@ -1,19 +1,28 @@
 import { useCallback, useState } from 'react';
 
+import { TASK_COLORS } from '@/constants/theme';
 import type { Task } from '@/types/task';
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+const defaultTaskColor = TASK_COLORS[0].hex;
+
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  const addTask = useCallback((title: string) => {
+  const addTask = useCallback((title: string, color?: string) => {
     const trimmed = title.trim();
     if (!trimmed) return;
     setTasks((prev) => [
-      { id: generateId(), title: trimmed, completed: false, createdAt: Date.now() },
+      {
+        id: generateId(),
+        title: trimmed,
+        completed: false,
+        color: color ?? defaultTaskColor,
+        createdAt: Date.now(),
+      },
       ...prev,
     ]);
   }, []);
