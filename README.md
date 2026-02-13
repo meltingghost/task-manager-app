@@ -1,50 +1,61 @@
-# Welcome to your Expo app 👋
+# Task Manager App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicación de gestión de tareas desarrollada con React Native (Expo). Permite añadir tareas, marcarlas como completadas, editarlas y eliminarlas, con filtros por estado y soporte para tema claro/oscuro.
 
-## Get started
+## Requisitos
 
-1. Install dependencies
+- Node.js (v18 o superior recomendado)
+- npm o yarn
+- [Expo Go](https://expo.dev/go) (opcional, para probar en dispositivo físico)
+
+## Cómo ejecutar
+
+1. Instalar dependencias:
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. Iniciar el proyecto:
 
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+3. Abrir la app:
+   - **iOS**: pulsar `i` en la terminal o escanear el QR con la cámara.
+   - **Android**: pulsar `a` en la terminal o escanear el QR con Expo Go.
+   - **Web**: pulsar `w` en la terminal.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Funcionalidades
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- **Añadir tarea**: campo de texto y botón "Añadir"; se puede enviar también con Intro.
+- **Marcar como completada**: tocar el icono circular junto a la tarea; las completadas se muestran tachadas y con check.
+- **Eliminar tarea**: tocar el icono de papelera; se muestra confirmación antes de borrar.
+- **Editar tarea**: mantener pulsado el texto de la tarea para entrar en modo edición; guardar o cancelar.
+- **Filtros**: pestañas "Todas", "Pendientes" y "Hechas" para filtrar la lista.
+- **Tema**: la app respeta el tema claro/oscuro del sistema.
+- **Feedback háptico**: al marcar completada y al eliminar (en dispositivos compatibles).
+- **Animaciones**: entrada suave al añadir una nueva tarea (Reanimated).
 
-## Get a fresh project
+## Estructura del proyecto
 
-When you're ready, run:
+- `types/task.ts`: tipo e interfaz de una tarea.
+- `hooks/use-tasks.ts`: hook con el estado de las tareas y las acciones (añadir, completar, eliminar, actualizar).
+- `components/task/`: componentes de la lista de tareas:
+  - `add-task-input.tsx`: input y botón para añadir.
+  - `task-item.tsx`: fila de una tarea (checkbox, título, edición, borrar).
+  - `task-list.tsx`: lista con `FlatList` y estado vacío.
+- `app/(tabs)/index.tsx`: pantalla principal (Tareas) con filtros y uso del hook.
 
-```bash
-npm run reset-project
-```
+## Dependencias destacadas
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+- **Expo (SDK 54)**: entorno y herramientas para React Native.
+- **React Native**: framework de UI.
+- **TypeScript**: tipado estático.
+- **Expo Router**: enrutamiento basado en archivos (carpeta `app/`).
+- **react-native-reanimated**: animaciones de entrada para las tareas.
+- **expo-haptics**: feedback háptico al completar y eliminar.
+- **@expo/vector-icons**: iconos (Material Icons) en la interfaz.
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+El estado de las tareas es solo en memoria (no hay persistencia). Para guardar entre sesiones se podría extender el hook con `expo-secure-store` o `AsyncStorage`.
