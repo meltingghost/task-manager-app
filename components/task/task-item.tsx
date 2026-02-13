@@ -28,6 +28,7 @@ function TaskItemComponent({ task, onToggle, onDelete, onUpdate }: TaskItemProps
   const iconColor = useThemeColor({}, 'icon');
   const tintColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');
+  const borderColor = useThemeColor({}, 'border');
 
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(task.title);
@@ -72,7 +73,7 @@ function TaskItemComponent({ task, onToggle, onDelete, onUpdate }: TaskItemProps
 
   if (isEditing && onUpdate) {
     return (
-      <View style={styles.row}>
+      <View style={[styles.row, styles.rowBorder, { borderBottomColor: borderColor }]}>
         <View style={[styles.colorBar, { backgroundColor: taskColor }]} />
         <TextInput
           style={[styles.input, { color: textColor }]}
@@ -105,7 +106,7 @@ function TaskItemComponent({ task, onToggle, onDelete, onUpdate }: TaskItemProps
   }
 
   return (
-    <Animated.View entering={FadeIn.duration(200)} style={styles.row}>
+    <Animated.View entering={FadeIn.duration(200)} style={[styles.row, styles.rowBorder, { borderBottomColor: borderColor }]}>
       <View style={[styles.colorBar, { backgroundColor: taskColor }]} />
       <Pressable
         onPress={handleToggle}
@@ -157,6 +158,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingLeft: 12,
     gap: 12,
+  },
+  rowBorder: {
+    borderBottomWidth: 1,
   },
   colorBar: {
     width: 4,

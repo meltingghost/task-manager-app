@@ -25,10 +25,11 @@ export function SearchAndFilterBar({
   const tintColor = useThemeColor({}, 'tint');
   const cardBg = useThemeColor({}, 'card');
   const borderColor = useThemeColor({}, 'border');
+  const surfaceColor = useThemeColor({}, 'surface');
 
   return (
     <>
-      <View style={[styles.row, { borderColor }]}>
+      <View style={[styles.row, { backgroundColor: surfaceColor, borderColor }]}>
         <View style={[styles.searchWrap, { borderColor }]}>
           <MaterialIcons name="search" size={20} color={iconColor} style={styles.searchIcon} />
           <TextInput

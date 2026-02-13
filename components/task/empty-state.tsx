@@ -31,5 +31,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18,
     opacity: 0.9,
+    fontFamily: 'Trebuchet MS',
   },
 });

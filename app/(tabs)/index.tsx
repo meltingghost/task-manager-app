@@ -1,3 +1,4 @@
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
@@ -9,8 +10,8 @@ import { TaskList } from '@/components/task/task-list';
 import { TasksHeader } from '@/components/task/tasks-header';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useThemeColor } from '@/hooks/use-theme-color';
 import { useTasks } from '@/hooks/use-tasks';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import type { Task } from '@/types/task';
 
 export type TaskFilter = 'all' | 'active' | 'completed';
@@ -46,8 +47,8 @@ export default function TasksScreen() {
     return result;
   }, [tasks, filter, searchQuery, colorFilter]);
 
-  const borderColor = useThemeColor({}, 'border');
   const tintColor = useThemeColor({}, 'tint');
+  const textColor = useThemeColor({}, 'text');
 
   const tabLabels: { key: TaskFilter; label: string }[] = [
     { key: 'all', label: 'Everything' },
@@ -56,40 +57,58 @@ export default function TasksScreen() {
   ];
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView>
       <TasksHeader />
 
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={[styles.tabsScroll, { borderBottomColor: borderColor }]}
+        style={[styles.tabsScroll, { backgroundColor: tintColor }]}
         contentContainerStyle={styles.tabsContent}
       >
-        {tabLabels.map(({ key, label }) => (
-          <Pressable
-            key={key}
-            onPress={() => setFilter(key)}
-            style={[styles.tab, filter === key && { borderBottomColor: tintColor }]}
-            accessibilityRole="button"
-            accessibilityLabel={
-              key === 'all' ? 'Show all tasks' : key === 'active' ? 'Show undone' : 'Show done'
-            }
-            accessibilityState={{ selected: filter === key }}
-          >
-            <ThemedText
-              style={[styles.tabText, filter === key && styles.tabTextActive]}
+        {tabLabels.map(({ key, label }) => {
+          const isSelected = filter === key;
+          return (
+            <Pressable
+              key={key}
+              onPress={() => setFilter(key)}
+              style={[
+                styles.tab,
+                isSelected && styles.tabSelected,
+                isSelected && {
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 4,
+                  elevation: 4,
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={
+                key === 'all' ? 'Show all tasks' : key === 'active' ? 'Show undone' : 'Show done'
+              }
+              accessibilityState={{ selected: isSelected }}
             >
-              {label}
-            </ThemedText>
-          </Pressable>
-        ))}
+              <ThemedText
+                style={[
+                  styles.tabText,
+                  { color: isSelected ? tintColor : textColor },
+                  isSelected && styles.tabTextActive,
+                ]}
+              >
+                {label}
+              </ThemedText>
+            </Pressable>
+          );
+        })}
         <Pressable
           onPress={() => setAddListModalVisible(true)}
-          style={styles.tab}
+          style={styles.tabAdd}
           accessibilityRole="button"
           accessibilityLabel="Add list"
         >
-          <ThemedText style={styles.tabTextAdd}>+Add List</ThemedText>
+          <MaterialIcons name="add" size={20} style={styles.tabAddIcon} />
+          <ThemedText style={[styles.tabTextAdd]}>Add List</ThemedText>
         </Pressable>
       </ScrollView>
 
@@ -100,7 +119,7 @@ export default function TasksScreen() {
         onColorFilterChange={setColorFilter}
       />
 
-      <View style={styles.listWrap}>
+      <View>
         <TaskList
           tasks={filteredTasks}
           onToggle={toggleTask}
@@ -126,38 +145,55 @@ export default function TasksScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   tabsScroll: {
-    maxHeight: 48,
-    borderBottomWidth: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
   },
   tabsContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    gap: 4,
+    gap: 10,
   },
   tab: {
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderBottomWidth: 3,
-    borderBottomColor: 'transparent',
+    backgroundColor: '#fff',
+    paddingVertical: 5,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  tabSelected: {
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.9)',
   },
   tabText: {
     fontSize: 14,
-    opacity: 0.85,
+    opacity: 0.9,
   },
   tabTextActive: {
+    fontWeight: '700',
     opacity: 1,
-    fontWeight: '600',
+  },
+  tabAdd: {
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    minHeight: 44,
+    gap: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  tabAddIcon: {
+    marginLeft: 2,
   },
   tabTextAdd: {
     fontSize: 14,
-    fontWeight: '600',
-  },
-  listWrap: {
-    flex: 1,
+    fontWeight: '500',
   },
 });

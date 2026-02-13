@@ -1,33 +1,42 @@
 /**
- * Theme colors: light/dark with a light-blue (celeste) palette.
+ * Theme: white + blue combination.
+ * Light: white backgrounds with light blue bands and blue accents.
  * TASK_COLORS are used for task color picker in Add task modal.
  */
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#2E9FD4';
-const tintColorDark = '#87CEEB';
+const bluePrimary = '#2563EB';
+const blueLight = '#3B82F6';
+const blueMuted = '#93C5FD';
+const blueBg = '#EFF6FF';
+const blueBorder = '#BFDBFE';
+const redPrimary = '#FF0000';
 
 export const Colors = {
   light: {
-    text: '#0F2D42',
-    background: '#F0F9FF',
-    tint: tintColorLight,
-    icon: '#5EB8E0',
-    tabIconDefault: '#87CEEB',
-    tabIconSelected: tintColorLight,
-    card: '#fff',
-    border: '#B8E0F0',
+    text: '#1E3A5F',
+    background: '#FFFFFF',
+    tint: bluePrimary,
+    icon: blueLight,
+    tabIconDefault: blueMuted,
+    tabIconSelected: bluePrimary,
+    card: '#FFFFFF',
+    border: blueBorder,
+    surface: blueBg,
+    exit: redPrimary,
   },
   dark: {
     text: '#E0F4FF',
-    background: '#0D2137',
-    tint: tintColorDark,
-    icon: '#87CEEB',
-    tabIconDefault: '#5EB8E0',
-    tabIconSelected: tintColorDark,
-    card: '#152D47',
-    border: '#2E5A7A',
+    background: '#0F172A',
+    tint: blueMuted,
+    icon: '#93C5FD',
+    tabIconDefault: '#64748B',
+    tabIconSelected: blueMuted,
+    card: '#1E293B',
+    border: '#334155',
+    surface: '#1E293B',
+    exit: redPrimary,
   },
 };
 

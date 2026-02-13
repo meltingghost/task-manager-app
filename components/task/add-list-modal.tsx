@@ -57,7 +57,6 @@ export function AddListModal({ visible, onClose }: AddListModalProps) {
               <ThemedText style={styles.createButtonText}>Create</ThemedText>
             </Pressable>
           </View>
-          <ThemedText style={styles.comingSoon}>Coming soon</ThemedText>
         </Pressable>
       </Pressable>
     </Modal>
