@@ -16,6 +16,12 @@ import { ThemedView } from '@/components/themed-view';
 import { useAuth } from '@/contexts/auth-context';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function isValidEmail(value: string): boolean {
+  return EMAIL_REGEX.test(value.trim());
+}
+
 export default function LoginScreen() {
   const router = useRouter();
   const { signIn } = useAuth();
@@ -28,6 +34,10 @@ export default function LoginScreen() {
   const cardBg = useThemeColor({}, 'card');
   const borderColor = useThemeColor({}, 'border');
   const surfaceColor = useThemeColor({}, 'surface');
+  const exitColor = useThemeColor({}, 'exit');
+
+  const emailTrimmed = email.trim();
+  const emailInvalid = emailTrimmed.length > 0 && !isValidEmail(emailTrimmed);
 
   const handleSignIn = useCallback(() => {
     Keyboard.dismiss();
@@ -35,7 +45,10 @@ export default function LoginScreen() {
     router.replace('/(tabs)');
   }, [signIn, router]);
 
-  const canSubmit = email.trim().length > 0 && password.length > 0;
+  const canSubmit =
+    emailTrimmed.length > 0 &&
+    password.length > 0 &&
+    isValidEmail(emailTrimmed);
 
   return (
     <ThemedView style={styles.container}>
@@ -58,7 +71,10 @@ export default function LoginScreen() {
           <View style={[styles.card, { backgroundColor: cardBg, borderColor }]}>
             <ThemedText style={[styles.label, { color: iconColor }]}>Email</ThemedText>
             <TextInput
-              style={[styles.input, { color: textColor, borderColor }]}
+              style={[
+                styles.input,
+                { color: textColor, borderColor: emailInvalid ? exitColor : borderColor },
+              ]}
               placeholder="you@example.com"
               placeholderTextColor={iconColor}
               value={email}
@@ -68,6 +84,11 @@ export default function LoginScreen() {
               autoCorrect={false}
               accessibilityLabel="Email"
             />
+            {emailInvalid && (
+              <ThemedText style={[styles.errorText, { color: exitColor }]}>
+                Please enter a valid email address
+              </ThemedText>
+            )}
             <ThemedText style={[styles.label, { color: iconColor, marginTop: 16 }]}>
               Password
             </ThemedText>
@@ -147,6 +168,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderWidth: 1,
     borderRadius: 8,
+  },
+  errorText: {
+    fontSize: 13,
+    marginTop: 6,
   },
   button: {
     marginTop: 24,

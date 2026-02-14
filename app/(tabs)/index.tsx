@@ -168,10 +168,11 @@ export default function TasksScreen() {
             <Pressable
               key={key}
               onPress={() => setFilter(key)}
-              style={[
+              style={({ pressed, hovered }) => [
                 styles.tab,
                 isSelected && [styles.tabSelected, { backgroundColor: cardBg }],
                 !isSelected && { backgroundColor: tabInactiveBg },
+                (pressed || hovered) && styles.tabPressed,
               ]}
               accessibilityRole="button"
               accessibilityLabel={
@@ -198,10 +199,11 @@ export default function TasksScreen() {
               key={list.id}
               onPress={() => setFilter(list.id)}
               onLongPress={() => openListOptions(list)}
-              style={[
+              style={({ pressed, hovered }) => [
                 styles.tab,
                 isSelected && [styles.tabSelected, { backgroundColor: cardBg }],
                 !isSelected && { backgroundColor: tabInactiveBg },
+                (pressed || hovered) && styles.tabPressed,
               ]}
               accessibilityRole="button"
               accessibilityLabel={`Show list ${list.name}. Long press to edit or delete.`}
@@ -222,7 +224,11 @@ export default function TasksScreen() {
         })}
         <Pressable
           onPress={() => setAddListModalVisible(true)}
-          style={[styles.tab, { backgroundColor: tabInactiveBg }]}
+          style={({ pressed, hovered }) => [
+            styles.tab,
+            { backgroundColor: tabInactiveBg },
+            (pressed || hovered) && styles.tabPressed,
+          ]}
           accessibilityRole="button"
           accessibilityLabel="Add list"
         >
@@ -445,6 +451,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 2,
     elevation: 2,
+  },
+  tabPressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
   },
   tabText: {
     fontSize: 13,
