@@ -2,7 +2,6 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useCallback, useMemo, useState } from 'react';
 import {
   Keyboard,
-  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -19,35 +18,20 @@ import { TaskList } from '@/components/task/task-list';
 import { TasksHeader } from '@/components/task/tasks-header';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { BaseModal } from '@/components/ui/base-modal';
 import { Toast } from '@/components/ui/toast';
 import { useLists } from '@/hooks/use-lists';
 import { useTasks } from '@/hooks/use-tasks';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import type { List } from '@/types/list';
-import type { Task } from '@/types/task';
+import {
+  filterTasks,
+  isTaskFilter,
+  type TabFilter,
+  type TaskFilter,
+} from '@/utils/task-filters';
 
-export type TaskFilter = 'all' | 'active' | 'completed';
-
-function filterByStatus(tasks: Task[], filter: TaskFilter): Task[] {
-  switch (filter) {
-    case 'active':
-      return tasks.filter((t) => !t.completed);
-    case 'completed':
-      return tasks.filter((t) => t.completed);
-    default:
-      return tasks;
-  }
-}
-
-function filterByList(tasks: Task[], listId: string): Task[] {
-  return tasks.filter((t) => (t.listIds ?? []).includes(listId));
-}
-
-export type TabFilter = TaskFilter | string;
-
-function isTaskFilter(value: TabFilter): value is TaskFilter {
-  return value === 'all' || value === 'active' || value === 'completed';
-}
+export type { TabFilter, TaskFilter };
 
 export default function TasksScreen() {
   const {
@@ -80,22 +64,10 @@ export default function TasksScreen() {
     setToast((prev) => ({ ...prev, visible: false }));
   }, []);
 
-  const filteredTasks = useMemo(() => {
-    let result: Task[];
-    if (isTaskFilter(filter)) {
-      result = filterByStatus(tasks, filter);
-    } else {
-      result = filterByList(tasks, filter);
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.trim().toLowerCase();
-      result = result.filter((t) => t.title.toLowerCase().includes(q));
-    }
-    if (colorFilter !== null) {
-      result = result.filter((t) => (t.color ?? '') === colorFilter);
-    }
-    return result;
-  }, [tasks, filter, searchQuery, colorFilter]);
+  const filteredTasks = useMemo(
+    () => filterTasks({ tasks, filter, searchQuery, colorFilter }),
+    [tasks, filter, searchQuery, colorFilter]
+  );
 
   const currentListId = isTaskFilter(filter) ? undefined : filter;
 
@@ -273,134 +245,101 @@ export default function TasksScreen() {
         onListCreated={() => showToast('List created')}
       />
 
-      <Modal
+      <BaseModal
         visible={listOptionsList !== null}
-        transparent
-        animationType="fade"
-        onRequestClose={closeListOptions}
+        onClose={closeListOptions}
+        title={listOptionsList?.name ?? ''}
       >
-        <Pressable style={styles.modalOverlay} onPress={closeListOptions}>
-          <Pressable
-            style={[styles.modalCard, { backgroundColor: cardBg, borderColor }]}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <ThemedText style={[styles.modalTitle, { color: textColor }]}>
-              {listOptionsList?.name}
-            </ThemedText>
-            <Pressable
-              onPress={() => listOptionsList && openRenameList(listOptionsList)}
-              style={({ pressed }) => [styles.modalOption, pressed && styles.modalOptionPressed]}
-            >
-              <MaterialIcons name="edit" size={22} color={iconColor} />
-              <ThemedText style={[styles.modalOptionText, { color: textColor }]}>
-                Rename list
-              </ThemedText>
-            </Pressable>
-            <Pressable
-              onPress={() => listOptionsList && openDeleteListConfirm(listOptionsList)}
-              style={({ pressed }) => [styles.modalOption, pressed && styles.modalOptionPressed]}
-            >
-              <MaterialIcons name="delete-outline" size={22} color={exitColor} />
-              <ThemedText style={[styles.modalOptionText, { color: exitColor }]}>
-                Delete list
-              </ThemedText>
-            </Pressable>
-          </Pressable>
+        <Pressable
+          onPress={() => listOptionsList && openRenameList(listOptionsList)}
+          style={({ pressed }) => [styles.modalOption, pressed && styles.modalOptionPressed]}
+        >
+          <MaterialIcons name="edit" size={22} color={iconColor} />
+          <ThemedText style={[styles.modalOptionText, { color: textColor }]}>
+            Rename list
+          </ThemedText>
         </Pressable>
-      </Modal>
+        <Pressable
+          onPress={() => listOptionsList && openDeleteListConfirm(listOptionsList)}
+          style={({ pressed }) => [styles.modalOption, pressed && styles.modalOptionPressed]}
+        >
+          <MaterialIcons name="delete-outline" size={22} color={exitColor} />
+          <ThemedText style={[styles.modalOptionText, { color: exitColor }]}>
+            Delete list
+          </ThemedText>
+        </Pressable>
+      </BaseModal>
 
-      <Modal
+      <BaseModal
         visible={renameList !== null}
-        transparent
-        animationType="fade"
-        onRequestClose={closeRenameList}
+        onClose={closeRenameList}
+        title="Rename list"
       >
-        <Pressable style={styles.modalOverlay} onPress={closeRenameList}>
+        <TextInput
+          style={[styles.modalInput, { color: textColor, borderColor, backgroundColor: surfaceColor }]}
+          placeholder="List name"
+          placeholderTextColor={iconColor}
+          value={renameDraft}
+          onChangeText={setRenameDraft}
+          accessibilityLabel="List name"
+        />
+        <View style={styles.modalActions}>
           <Pressable
-            style={[styles.modalCard, { backgroundColor: cardBg, borderColor }]}
-            onPress={(e) => e.stopPropagation()}
+            onPress={closeRenameList}
+            style={({ pressed }) => [
+              styles.modalButton,
+              { backgroundColor: surfaceColor },
+              pressed && styles.modalOptionPressed,
+            ]}
           >
-            <ThemedText style={[styles.modalTitle, { color: textColor }]}>
-              Rename list
-            </ThemedText>
-            <TextInput
-              style={[styles.modalInput, { color: textColor, borderColor, backgroundColor: surfaceColor }]}
-              placeholder="List name"
-              placeholderTextColor={iconColor}
-              value={renameDraft}
-              onChangeText={setRenameDraft}
-              accessibilityLabel="List name"
-            />
-            <View style={styles.modalActions}>
-              <Pressable
-                onPress={closeRenameList}
-                style={({ pressed }) => [
-                  styles.modalButton,
-                  { backgroundColor: surfaceColor },
-                  pressed && styles.modalOptionPressed,
-                ]}
-              >
-                <ThemedText style={[styles.modalButtonText, { color: textColor }]}>Cancel</ThemedText>
-              </Pressable>
-              <Pressable
-                onPress={saveRenameList}
-                disabled={!renameDraft.trim()}
-                style={({ pressed }) => [
-                  styles.modalButton,
-                  { backgroundColor: tintColor },
-                  !renameDraft.trim() && styles.modalButtonDisabled,
-                  pressed && styles.modalOptionPressed,
-                ]}
-              >
-                <ThemedText style={styles.modalButtonPrimaryText}>Save</ThemedText>
-              </Pressable>
-            </View>
+            <ThemedText style={[styles.modalButtonText, { color: textColor }]}>Cancel</ThemedText>
           </Pressable>
-        </Pressable>
-      </Modal>
+          <Pressable
+            onPress={saveRenameList}
+            disabled={!renameDraft.trim()}
+            style={({ pressed }) => [
+              styles.modalButton,
+              { backgroundColor: tintColor },
+              !renameDraft.trim() && styles.modalButtonDisabled,
+              pressed && styles.modalOptionPressed,
+            ]}
+          >
+            <ThemedText style={styles.modalButtonPrimaryText}>Save</ThemedText>
+          </Pressable>
+        </View>
+      </BaseModal>
 
-      <Modal
+      <BaseModal
         visible={deleteListConfirm !== null}
-        transparent
-        animationType="fade"
-        onRequestClose={closeDeleteListConfirm}
+        onClose={closeDeleteListConfirm}
+        title="Delete list"
       >
-        <Pressable style={styles.modalOverlay} onPress={closeDeleteListConfirm}>
+        <ThemedText style={[styles.modalMessage, { color: textColor }]}>
+          {`Delete "${deleteListConfirm?.name}"? Tasks will be removed from this list.`}
+        </ThemedText>
+        <View style={styles.modalActions}>
           <Pressable
-            style={[styles.modalCard, { backgroundColor: cardBg, borderColor }]}
-            onPress={(e) => e.stopPropagation()}
+            onPress={closeDeleteListConfirm}
+            style={({ pressed }) => [
+              styles.modalButton,
+              { backgroundColor: surfaceColor },
+              pressed && styles.modalOptionPressed,
+            ]}
           >
-            <ThemedText style={[styles.modalTitle, { color: textColor }]}>
-              Delete list
-            </ThemedText>
-            <ThemedText style={[styles.modalMessage, { color: textColor }]}>
-              {`Delete "${deleteListConfirm?.name}"? Tasks will be removed from this list.`}
-            </ThemedText>
-            <View style={styles.modalActions}>
-              <Pressable
-                onPress={closeDeleteListConfirm}
-                style={({ pressed }) => [
-                  styles.modalButton,
-                  { backgroundColor: surfaceColor },
-                  pressed && styles.modalOptionPressed,
-                ]}
-              >
-                <ThemedText style={[styles.modalButtonText, { color: textColor }]}>Cancel</ThemedText>
-              </Pressable>
-              <Pressable
-                onPress={confirmDeleteList}
-                style={({ pressed }) => [
-                  styles.modalButton,
-                  { backgroundColor: exitColor },
-                  pressed && styles.modalOptionPressed,
-                ]}
-              >
-                <ThemedText style={styles.modalButtonPrimaryText}>Delete</ThemedText>
-              </Pressable>
-            </View>
+            <ThemedText style={[styles.modalButtonText, { color: textColor }]}>Cancel</ThemedText>
           </Pressable>
-        </Pressable>
-      </Modal>
+          <Pressable
+            onPress={confirmDeleteList}
+            style={({ pressed }) => [
+              styles.modalButton,
+              { backgroundColor: exitColor },
+              pressed && styles.modalOptionPressed,
+            ]}
+          >
+            <ThemedText style={styles.modalButtonPrimaryText}>Delete</ThemedText>
+          </Pressable>
+        </View>
+      </BaseModal>
 
       <Toast
         visible={toast.visible}
@@ -470,25 +409,6 @@ const styles = StyleSheet.create({
   tabTextAdd: {
     fontSize: 13,
     fontWeight: '500',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  modalCard: {
-    width: '100%',
-    maxWidth: 360,
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 24,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 16,
   },
   modalMessage: {
     fontSize: 15,

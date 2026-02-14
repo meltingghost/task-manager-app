@@ -46,14 +46,47 @@ A task management app built with React Native (Expo). Add tasks, mark them compl
 
 ## Project structure
 
-- `types/task.ts`, `types/list.ts`: task and list types.
-- `hooks/use-tasks.ts`: task state and actions (add, toggle, delete, update, add/remove from list).
-- `hooks/use-lists.ts`: list state and actions (add, update, delete).
-- `contexts/auth-context.tsx`: auth state with AsyncStorage persistence.
-- `components/task/`: task UI (task-item, task-list, add-task-modal, add-list-modal, tasks-header, search-and-filter-bar, empty-state, floating-add-button).
-- `app/(tabs)/index.tsx`: main Tasks screen with tabs, filters, and modals.
-- `app/login.tsx`: login screen.
-- `constants/theme.ts`: light/dark colors and task color palette.
+```
+app/
+├── (tabs)/
+│   ├── _layout.tsx      # Tabs layout (single screen)
+│   └── index.tsx        # Main Tasks screen (tabs, filters, list modals)
+├── _layout.tsx          # Root layout, theme, auth guard
+└── login.tsx             # Login screen
+
+components/
+├── task/                 # Task feature UI
+│   ├── add-list-modal.tsx
+│   ├── add-task-modal.tsx
+│   ├── empty-state.tsx
+│   ├── floating-add-button.tsx
+│   ├── search-and-filter-bar.tsx
+│   ├── task-item.tsx
+│   ├── task-list.tsx
+│   └── tasks-header.tsx
+└── ui/                   # Shared UI primitives
+    ├── base-modal.tsx    # Reusable modal (overlay + card + title)
+    └── toast.tsx
+
+contexts/
+└── auth-context.tsx      # Auth state + AsyncStorage persistence
+
+hooks/
+├── use-color-scheme.ts
+├── use-lists.ts          # List CRUD
+├── use-tasks.ts          # Task CRUD + list assignment
+└── use-theme-color.ts
+
+types/
+├── list.ts
+└── task.ts
+
+utils/
+└── task-filters.ts       # Filter logic (status, list, search, color)
+
+constants/
+└── theme.ts              # Light/dark colors, task color palette
+```
 
 ## Key dependencies
 
