@@ -1,6 +1,6 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useState } from 'react';
-import { Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, TextInput, useColorScheme, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { TASK_COLORS } from '@/constants/theme';
@@ -20,6 +20,7 @@ export function SearchAndFilterBar({
   onColorFilterChange,
 }: SearchAndFilterBarProps) {
   const [colorModalVisible, setColorModalVisible] = useState(false);
+  const colorScheme = useColorScheme();
   const textColor = useThemeColor({}, 'text');
   const iconColor = useThemeColor({}, 'icon');
   const tintColor = useThemeColor({}, 'tint');
@@ -27,13 +28,16 @@ export function SearchAndFilterBar({
   const borderColor = useThemeColor({}, 'border');
   const surfaceColor = useThemeColor({}, 'surface');
 
+  const filterDotBorderColor = colorScheme === 'dark' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.2)';
+  const overlayBg = colorScheme === 'dark' ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.4)';
+
   return (
     <>
-      <View style={[styles.row, { backgroundColor: surfaceColor, borderColor }]}>
-        <View style={[styles.searchWrap, { borderColor }]}>
+      <View style={[styles.row, { backgroundColor: surfaceColor, borderBottomColor: borderColor }]}>
+        <View style={[styles.searchWrap, { backgroundColor: cardBg, borderColor }]}>
           <MaterialIcons name="search" size={20} color={iconColor} style={styles.searchIcon} />
           <TextInput
-            style={[styles.searchInput, { color: textColor }]}
+            style={[styles.searchInput, { color: textColor, backgroundColor: cardBg }]}
             placeholder="Search tasks..."
             placeholderTextColor={iconColor}
             value={searchValue}
@@ -50,7 +54,7 @@ export function SearchAndFilterBar({
           <MaterialIcons name="palette" size={22} color={selectedColorFilter ?? iconColor} />
           {selectedColorFilter !== null && (
             <View
-              style={[styles.filterDot, { backgroundColor: selectedColorFilter }]}
+              style={[styles.filterDot, { backgroundColor: selectedColorFilter, borderColor: filterDotBorderColor }]}
             />
           )}
         </Pressable>
@@ -63,7 +67,7 @@ export function SearchAndFilterBar({
         onRequestClose={() => setColorModalVisible(false)}
       >
         <Pressable
-          style={styles.colorModalOverlay}
+          style={[styles.colorModalOverlay, { backgroundColor: overlayBg }]}
           onPress={() => setColorModalVisible(false)}
         >
           <View style={[styles.colorModalContent, { backgroundColor: cardBg, borderColor }]}>
@@ -82,7 +86,7 @@ export function SearchAndFilterBar({
                 All colors
               </ThemedText>
             </Pressable>
-            {TASK_COLORS.map(({ hex }) => (
+            {TASK_COLORS.map(({ hex, name }) => (
               <Pressable
                 key={hex}
                 onPress={() => {
@@ -95,8 +99,13 @@ export function SearchAndFilterBar({
                 ]}
               >
                 <View style={[styles.colorOptionChip, { backgroundColor: hex }]} />
-                <ThemedText style={selectedColorFilter === hex ? styles.colorOptionTextActive : undefined}>
-                  {hex}
+                <ThemedText
+                  style={[
+                    selectedColorFilter === hex ? styles.colorOptionTextActive : undefined,
+                    selectedColorFilter !== hex && { color: textColor },
+                  ]}
+                >
+                  {name}
                 </ThemedText>
               </Pressable>
             ))}
@@ -117,6 +126,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   searchWrap: {
+    overflow: 'hidden',
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
@@ -150,11 +160,9 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.2)',
   },
   colorModalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,

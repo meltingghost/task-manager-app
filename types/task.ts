@@ -7,5 +7,6 @@ export interface Task {
   title: string;
   completed: boolean;
   color?: string;
+  listId?: string;
   createdAt?: number;
 }

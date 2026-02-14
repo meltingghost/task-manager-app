@@ -12,7 +12,7 @@ const defaultTaskColor = TASK_COLORS[0].hex;
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  const addTask = useCallback((title: string, color?: string) => {
+  const addTask = useCallback((title: string, color?: string, listId?: string) => {
     const trimmed = title.trim();
     if (!trimmed) return;
     setTasks((prev) => [
@@ -21,6 +21,7 @@ export function useTasks() {
         title: trimmed,
         completed: false,
         color: color ?? defaultTaskColor,
+        listId,
         createdAt: Date.now(),
       },
       ...prev,

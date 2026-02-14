@@ -1,4 +1,6 @@
+import { useCallback, useState } from 'react';
 import {
+  Keyboard,
   Modal,
   Pressable,
   StyleSheet,
@@ -12,23 +14,42 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 export interface AddListModalProps {
   visible: boolean;
   onClose: () => void;
+  onCreateList: (name: string) => void;
 }
 
-export function AddListModal({ visible, onClose }: AddListModalProps) {
+export function AddListModal({ visible, onClose, onCreateList }: AddListModalProps) {
+  const [listName, setListName] = useState('');
   const tintColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');
   const iconColor = useThemeColor({}, 'icon');
   const cardBg = useThemeColor({}, 'card');
   const borderColor = useThemeColor({}, 'border');
 
+  const handleCreate = useCallback(() => {
+    const trimmed = listName.trim();
+    if (trimmed) {
+      onCreateList(trimmed);
+      setListName('');
+      Keyboard.dismiss();
+      onClose();
+    }
+  }, [listName, onCreateList, onClose]);
+
+  const handleClose = useCallback(() => {
+    setListName('');
+    onClose();
+  }, [onClose]);
+
+  const canCreate = listName.trim().length > 0;
+
   return (
     <Modal
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
-      <Pressable style={styles.overlay} onPress={onClose}>
+      <Pressable style={styles.overlay} onPress={handleClose}>
         <Pressable
           style={[styles.content, { backgroundColor: cardBg, borderColor }]}
           onPress={(e) => e.stopPropagation()}
@@ -40,19 +61,26 @@ export function AddListModal({ visible, onClose }: AddListModalProps) {
             style={[styles.input, { color: textColor, borderColor }]}
             placeholder="List name"
             placeholderTextColor={iconColor}
-            editable={false}
+            value={listName}
+            onChangeText={setListName}
             accessibilityLabel="List name"
           />
           <View style={styles.actions}>
             <Pressable
-              onPress={onClose}
+              onPress={handleClose}
               style={({ pressed }) => [styles.button, pressed && styles.pressed]}
             >
               <ThemedText type="defaultSemiBold">Close</ThemedText>
             </Pressable>
             <Pressable
-              style={[styles.button, styles.createButton, { backgroundColor: tintColor }]}
-              onPress={onClose}
+              onPress={handleCreate}
+              disabled={!canCreate}
+              style={[
+                styles.button,
+                styles.createButton,
+                { backgroundColor: tintColor },
+                !canCreate && styles.buttonDisabled,
+              ]}
             >
               <ThemedText style={styles.createButtonText}>Create</ThemedText>
             </Pressable>
@@ -100,17 +128,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   createButton: {},
+  buttonDisabled: {
+    opacity: 0.5,
+  },
   createButtonText: {
     color: '#fff',
     fontWeight: '600',
   },
   pressed: {
     opacity: 0.8,
-  },
-  comingSoon: {
-    marginTop: 16,
-    textAlign: 'center',
-    opacity: 0.7,
-    fontSize: 14,
   },
 });

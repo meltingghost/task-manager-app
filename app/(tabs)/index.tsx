@@ -1,6 +1,6 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
 
 import { AddListModal } from '@/components/task/add-list-modal';
 import { AddTaskModal } from '@/components/task/add-task-modal';
@@ -10,6 +10,7 @@ import { TaskList } from '@/components/task/task-list';
 import { TasksHeader } from '@/components/task/tasks-header';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useLists } from '@/hooks/use-lists';
 import { useTasks } from '@/hooks/use-tasks';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import type { Task } from '@/types/task';
@@ -27,16 +28,32 @@ function filterByStatus(tasks: Task[], filter: TaskFilter): Task[] {
   }
 }
 
+function filterByList(tasks: Task[], listId: string): Task[] {
+  return tasks.filter((t) => t.listId === listId);
+}
+
+export type TabFilter = TaskFilter | string;
+
+function isTaskFilter(value: TabFilter): value is TaskFilter {
+  return value === 'all' || value === 'active' || value === 'completed';
+}
+
 export default function TasksScreen() {
   const { tasks, addTask, toggleTask, deleteTask, updateTask } = useTasks();
-  const [filter, setFilter] = useState<TaskFilter>('all');
+  const { lists, addList } = useLists();
+  const [filter, setFilter] = useState<TabFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [colorFilter, setColorFilter] = useState<string | null>(null);
   const [addTaskModalVisible, setAddTaskModalVisible] = useState(false);
   const [addListModalVisible, setAddListModalVisible] = useState(false);
 
   const filteredTasks = useMemo(() => {
-    let result = filterByStatus(tasks, filter);
+    let result: Task[];
+    if (isTaskFilter(filter)) {
+      result = filterByStatus(tasks, filter);
+    } else {
+      result = filterByList(tasks, filter);
+    }
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
       result = result.filter((t) => t.title.toLowerCase().includes(q));
@@ -47,10 +64,15 @@ export default function TasksScreen() {
     return result;
   }, [tasks, filter, searchQuery, colorFilter]);
 
-  const tintColor = useThemeColor({}, 'tint');
-  const textColor = useThemeColor({}, 'text');
+  const currentListId = isTaskFilter(filter) ? undefined : filter;
 
-  const tabLabels: { key: TaskFilter; label: string }[] = [
+  const colorScheme = useColorScheme();
+  const textColor = useThemeColor({}, 'text');
+  const cardBg = useThemeColor({}, 'card');
+  const tabBarBg = colorScheme === 'dark' ? '#8ea8bd' : '#b5daf7';
+  const tabInactiveBg = colorScheme === 'dark' ? '#93999e' : '#e8f4fc';
+
+  const mainTabs: { key: TaskFilter; label: string }[] = [
     { key: 'all', label: 'Everything' },
     { key: 'active', label: 'Undone' },
     { key: 'completed', label: 'Done' },
@@ -63,10 +85,10 @@ export default function TasksScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={[styles.tabsScroll, { backgroundColor: tintColor }]}
+        style={[styles.tabsScroll, { backgroundColor: tabBarBg }]}
         contentContainerStyle={styles.tabsContent}
       >
-        {tabLabels.map(({ key, label }) => {
+        {mainTabs.map(({ key, label }) => {
           const isSelected = filter === key;
           return (
             <Pressable
@@ -74,14 +96,8 @@ export default function TasksScreen() {
               onPress={() => setFilter(key)}
               style={[
                 styles.tab,
-                isSelected && styles.tabSelected,
-                isSelected && {
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 4,
-                  elevation: 4,
-                },
+                isSelected && [styles.tabSelected, { backgroundColor: cardBg }],
+                !isSelected && { backgroundColor: tabInactiveBg },
               ]}
               accessibilityRole="button"
               accessibilityLabel={
@@ -92,7 +108,7 @@ export default function TasksScreen() {
               <ThemedText
                 style={[
                   styles.tabText,
-                  { color: isSelected ? tintColor : textColor },
+                  { color: textColor },
                   isSelected && styles.tabTextActive,
                 ]}
               >
@@ -101,14 +117,42 @@ export default function TasksScreen() {
             </Pressable>
           );
         })}
+        {lists.map((list) => {
+          const isSelected = filter === list.id;
+          return (
+            <Pressable
+              key={list.id}
+              onPress={() => setFilter(list.id)}
+              style={[
+                styles.tab,
+                isSelected && [styles.tabSelected, { backgroundColor: cardBg }],
+                !isSelected && { backgroundColor: tabInactiveBg },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={`Show list ${list.name}`}
+              accessibilityState={{ selected: isSelected }}
+            >
+              <ThemedText
+                style={[
+                  styles.tabText,
+                  { color: textColor },
+                  isSelected && styles.tabTextActive,
+                ]}
+                numberOfLines={1}
+              >
+                {list.name}
+              </ThemedText>
+            </Pressable>
+          );
+        })}
         <Pressable
           onPress={() => setAddListModalVisible(true)}
-          style={styles.tabAdd}
+          style={[styles.tab, { backgroundColor: tabInactiveBg }]}
           accessibilityRole="button"
           accessibilityLabel="Add list"
         >
-          <MaterialIcons name="add" size={20} style={styles.tabAddIcon} />
-          <ThemedText style={[styles.tabTextAdd]}>Add List</ThemedText>
+          <MaterialIcons name="add" size={18} color={textColor} style={styles.tabAddIcon} />
+          <ThemedText style={[styles.tabTextAdd, { color: textColor }]}>Add List</ThemedText>
         </Pressable>
       </ScrollView>
 
@@ -133,12 +177,13 @@ export default function TasksScreen() {
       <AddTaskModal
         visible={addTaskModalVisible}
         onClose={() => setAddTaskModalVisible(false)}
-        onSubmit={(title, color) => addTask(title, color)}
+        onSubmit={(title, color) => addTask(title, color, currentListId)}
       />
 
       <AddListModal
         visible={addListModalVisible}
         onClose={() => setAddListModalVisible(false)}
+        onCreateList={addList}
       />
     </ThemedView>
   );
@@ -146,54 +191,50 @@ export default function TasksScreen() {
 
 const styles = StyleSheet.create({
   tabsScroll: {
-    paddingVertical: 12,
-    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingHorizontal: 8,
+    paddingBottom: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.08)',
   },
   tabsContent: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+    alignItems: 'flex-end',
+    gap: 2,
   },
   tab: {
-    backgroundColor: '#fff',
-    paddingVertical: 5,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    minHeight: 44,
-    justifyContent: 'center',
-  },
-  tabSelected: {
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.9)',
-  },
-  tabText: {
-    fontSize: 14,
-    opacity: 0.9,
-  },
-  tabTextActive: {
-    fontWeight: '700',
-    opacity: 1,
-  },
-  tabAdd: {
-    backgroundColor: '#fff',
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    minHeight: 44,
-    gap: 6,
+    paddingHorizontal: 16,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    minHeight: 40,
+    justifyContent: 'center',
+    marginBottom: -1,
+  },
+  tabSelected: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: -1 },
+    shadowOpacity: 0.08,
     shadowRadius: 2,
     elevation: 2,
   },
+  tabText: {
+    fontSize: 13,
+    opacity: 0.95,
+  },
+  tabTextActive: {
+    fontWeight: '600',
+    opacity: 1,
+  },
   tabAddIcon: {
-    marginLeft: 2,
+    marginRight: 4,
   },
   tabTextAdd: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '500',
   },
 });

@@ -42,15 +42,15 @@ export const Colors = {
 
 export type TaskColorId = string;
 
-export const TASK_COLORS: { id: string; hex: string }[] = [
-  { id: 'sky', hex: '#87CEEB' },
-  { id: 'aqua', hex: '#5EB8E0' },
-  { id: 'teal', hex: '#2E9FD4' },
-  { id: 'mint', hex: '#7FDBDA' },
-  { id: 'powder', hex: '#B8E0F0' },
-  { id: 'steel', hex: '#4682B4' },
-  { id: 'cyan', hex: '#00BCD4' },
-  { id: 'light', hex: '#E0F4FF' },
+export const TASK_COLORS: { id: string; name: string; hex: string }[] = [
+  { id: 'sky', name: 'Sky', hex: '#87CEEB' },
+  { id: 'coral', name: 'Coral', hex: '#FF7F50' },
+  { id: 'mint', name: 'Mint', hex: '#98D8AA' },
+  { id: 'lavender', name: 'Lavender', hex: '#E6E6FA' },
+  { id: 'gold', name: 'Gold', hex: '#FFD700' },
+  { id: 'salmon', name: 'Salmon', hex: '#FA8072' },
+  { id: 'teal', name: 'Teal', hex: '#20B2AA' },
+  { id: 'violet', name: 'Violet', hex: '#EE82EE' },
 ];
 
 export const Fonts = Platform.select({
