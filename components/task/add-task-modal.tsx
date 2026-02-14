@@ -16,9 +16,10 @@ export interface AddTaskModalProps {
   visible: boolean;
   onClose: () => void;
   onSubmit: (title: string, color: string) => void;
+  onTaskAdded?: () => void;
 }
 
-export function AddTaskModal({ visible, onClose, onSubmit }: AddTaskModalProps) {
+export function AddTaskModal({ visible, onClose, onSubmit, onTaskAdded }: AddTaskModalProps) {
   const [title, setTitle] = useState('');
   const [selectedColor, setSelectedColor] = useState(TASK_COLORS[0].hex);
   const tintColor = useThemeColor({}, 'tint');
@@ -34,8 +35,9 @@ export function AddTaskModal({ visible, onClose, onSubmit }: AddTaskModalProps) 
       setTitle('');
       setSelectedColor(TASK_COLORS[0].hex);
       onClose();
+      onTaskAdded?.();
     }
-  }, [title, selectedColor, onSubmit, onClose]);
+  }, [title, selectedColor, onSubmit, onClose, onTaskAdded]);
 
   const handleClose = useCallback(() => {
     setTitle('');

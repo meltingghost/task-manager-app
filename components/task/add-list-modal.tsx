@@ -15,9 +15,10 @@ export interface AddListModalProps {
   visible: boolean;
   onClose: () => void;
   onCreateList: (name: string) => void;
+  onListCreated?: () => void;
 }
 
-export function AddListModal({ visible, onClose, onCreateList }: AddListModalProps) {
+export function AddListModal({ visible, onClose, onCreateList, onListCreated }: AddListModalProps) {
   const [listName, setListName] = useState('');
   const tintColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');
@@ -32,8 +33,9 @@ export function AddListModal({ visible, onClose, onCreateList }: AddListModalPro
       setListName('');
       Keyboard.dismiss();
       onClose();
+      onListCreated?.();
     }
-  }, [listName, onCreateList, onClose]);
+  }, [listName, onCreateList, onClose, onListCreated]);
 
   const handleClose = useCallback(() => {
     setListName('');

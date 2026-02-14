@@ -1,4 +1,5 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useRouter } from 'expo-router';
 import type { ComponentProps } from 'react';
 import { useCallback, useState } from 'react';
 import {
@@ -11,18 +12,25 @@ import {
   View,
 } from 'react-native';
 
+import { useAuth } from '@/contexts/auth-context';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 const AVATAR_ICONS: ComponentProps<typeof MaterialIcons>['name'][] = [
   'person',
   'face',
-  'account_circle',
+  'account-circle',
   'badge',
   'psychology',
   'school',
 ];
 
-export function TasksHeader() {
+export interface TasksHeaderProps {
+  onProfileSaved?: () => void;
+}
+
+export function TasksHeader({ onProfileSaved }: TasksHeaderProps = {}) {
+  const router = useRouter();
+  const { signOut } = useAuth();
   const tintColor = useThemeColor({}, 'tint');
   const exitColor = useThemeColor({}, 'exit');
   const borderColor = useThemeColor({}, 'border');
@@ -57,7 +65,8 @@ export function TasksHeader() {
     setUserName(profileNameDraft.trim());
     setAvatarIcon(profileIconDraft);
     closeProfileModal();
-  }, [profileNameDraft, profileIconDraft, closeProfileModal]);
+    onProfileSaved?.();
+  }, [profileNameDraft, profileIconDraft, closeProfileModal, onProfileSaved]);
 
   const titleText = userName.trim() ? `${userName.trim()}'s Tasks` : 'Your Tasks';
 
@@ -102,7 +111,8 @@ export function TasksHeader() {
               style={({ pressed }) => [styles.menuItem, pressed && styles.menuItemPressed]}
               onPress={() => {
                 closeMenu();
-                // Here you would call your logout logic
+                signOut();
+                router.replace('/login');
               }}
             >
               <MaterialIcons name="logout" size={22} color={exitColor} />

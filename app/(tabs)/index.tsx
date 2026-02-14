@@ -1,5 +1,5 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
 
 import { AddListModal } from '@/components/task/add-list-modal';
@@ -10,6 +10,7 @@ import { TaskList } from '@/components/task/task-list';
 import { TasksHeader } from '@/components/task/tasks-header';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { Toast } from '@/components/ui/toast';
 import { useLists } from '@/hooks/use-lists';
 import { useTasks } from '@/hooks/use-tasks';
 import { useThemeColor } from '@/hooks/use-theme-color';
@@ -29,7 +30,7 @@ function filterByStatus(tasks: Task[], filter: TaskFilter): Task[] {
 }
 
 function filterByList(tasks: Task[], listId: string): Task[] {
-  return tasks.filter((t) => t.listId === listId);
+  return tasks.filter((t) => (t.listIds ?? []).includes(listId));
 }
 
 export type TabFilter = TaskFilter | string;
@@ -39,13 +40,22 @@ function isTaskFilter(value: TabFilter): value is TaskFilter {
 }
 
 export default function TasksScreen() {
-  const { tasks, addTask, toggleTask, deleteTask, updateTask } = useTasks();
+  const { tasks, addTask, toggleTask, deleteTask, updateTask, addTaskToList, removeTaskFromList } = useTasks();
   const { lists, addList } = useLists();
   const [filter, setFilter] = useState<TabFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [colorFilter, setColorFilter] = useState<string | null>(null);
   const [addTaskModalVisible, setAddTaskModalVisible] = useState(false);
   const [addListModalVisible, setAddListModalVisible] = useState(false);
+  const [toast, setToast] = useState({ visible: false, message: '' });
+
+  const showToast = useCallback((message: string) => {
+    setToast({ visible: true, message });
+  }, []);
+
+  const dismissToast = useCallback(() => {
+    setToast((prev) => ({ ...prev, visible: false }));
+  }, []);
 
   const filteredTasks = useMemo(() => {
     let result: Task[];
@@ -79,8 +89,8 @@ export default function TasksScreen() {
   ];
 
   return (
-    <ThemedView>
-      <TasksHeader />
+    <ThemedView style={styles.container}>
+      <TasksHeader onProfileSaved={() => showToast('Perfil actualizado')} />
 
       <ScrollView
         horizontal
@@ -163,12 +173,16 @@ export default function TasksScreen() {
         onColorFilterChange={setColorFilter}
       />
 
-      <View>
+      <View style={styles.listContainer}>
         <TaskList
           tasks={filteredTasks}
+          lists={lists}
           onToggle={toggleTask}
           onDelete={deleteTask}
           onUpdate={updateTask}
+          onAddTaskToList={addTaskToList}
+          onRemoveTaskFromList={removeTaskFromList}
+          onShowToast={showToast}
         />
       </View>
 
@@ -178,19 +192,34 @@ export default function TasksScreen() {
         visible={addTaskModalVisible}
         onClose={() => setAddTaskModalVisible(false)}
         onSubmit={(title, color) => addTask(title, color, currentListId)}
+        onTaskAdded={() => showToast('Tarea añadida')}
       />
 
       <AddListModal
         visible={addListModalVisible}
         onClose={() => setAddListModalVisible(false)}
         onCreateList={addList}
+        onListCreated={() => showToast('Lista creada correctamente')}
+      />
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        onDismiss={dismissToast}
       />
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  listContainer: {
+    flex: 1,
+  },
   tabsScroll: {
+    flexGrow: 0,
+    flexShrink: 0,
     paddingTop: 10,
     paddingHorizontal: 8,
     paddingBottom: 0,

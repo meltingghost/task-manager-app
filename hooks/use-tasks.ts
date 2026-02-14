@@ -21,11 +21,33 @@ export function useTasks() {
         title: trimmed,
         completed: false,
         color: color ?? defaultTaskColor,
-        listId,
+        listIds: listId ? [listId] : [],
         createdAt: Date.now(),
       },
       ...prev,
     ]);
+  }, []);
+
+  const addTaskToList = useCallback((taskId: string, listId: string) => {
+    setTasks((prev) =>
+      prev.map((t) => {
+        if (t.id !== taskId) return t;
+        const ids = t.listIds ?? [];
+        if (ids.includes(listId)) return t;
+        return { ...t, listIds: [...ids, listId] };
+      })
+    );
+  }, []);
+
+  const removeTaskFromList = useCallback((taskId: string, listId: string) => {
+    setTasks((prev) =>
+      prev.map((t) => {
+        if (t.id !== taskId) return t;
+        const ids = t.listIds ?? [];
+        if (!ids.includes(listId)) return t;
+        return { ...t, listIds: ids.filter((id) => id !== listId) };
+      })
+    );
   }, []);
 
   const toggleTask = useCallback((id: string) => {
@@ -46,5 +68,13 @@ export function useTasks() {
     );
   }, []);
 
-  return { tasks, addTask, toggleTask, deleteTask, updateTask };
+  return {
+    tasks,
+    addTask,
+    toggleTask,
+    deleteTask,
+    updateTask,
+    addTaskToList,
+    removeTaskFromList,
+  };
 }

@@ -7,6 +7,7 @@ export interface Task {
   title: string;
   completed: boolean;
   color?: string;
-  listId?: string;
+  /** Task can belong to multiple lists. Empty or undefined = no list. */
+  listIds?: string[];
   createdAt?: number;
 }

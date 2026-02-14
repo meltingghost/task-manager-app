@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { FlatList, ListRenderItem, StyleSheet } from 'react-native';
 
+import type { List } from '@/types/list';
 import type { Task } from '@/types/task';
 
 import { EmptyState } from './empty-state';
@@ -8,22 +9,39 @@ import { TaskItem } from './task-item';
 
 export interface TaskListProps {
   tasks: Task[];
+  lists: List[];
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onUpdate?: (id: string, title: string) => void;
+  onAddTaskToList: (taskId: string, listId: string) => void;
+  onRemoveTaskFromList: (taskId: string, listId: string) => void;
+  onShowToast?: (message: string) => void;
 }
 
-export function TaskList({ tasks, onToggle, onDelete, onUpdate }: TaskListProps) {
+export function TaskList({
+  tasks,
+  lists,
+  onToggle,
+  onDelete,
+  onUpdate,
+  onAddTaskToList,
+  onRemoveTaskFromList,
+  onShowToast,
+}: TaskListProps) {
   const renderItem: ListRenderItem<Task> = useCallback(
     ({ item }) => (
       <TaskItem
         task={item}
+        lists={lists}
         onToggle={onToggle}
         onDelete={onDelete}
         onUpdate={onUpdate}
+        onAddTaskToList={onAddTaskToList}
+        onRemoveTaskFromList={onRemoveTaskFromList}
+        onShowToast={onShowToast}
       />
     ),
-    [onToggle, onDelete, onUpdate]
+    [lists, onToggle, onDelete, onUpdate, onAddTaskToList, onRemoveTaskFromList, onShowToast]
   );
 
   return (
