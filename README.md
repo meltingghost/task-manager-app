@@ -50,20 +50,27 @@ A task management app built with React Native (Expo). Add tasks, mark them compl
 app/
 ├── (tabs)/
 │   ├── _layout.tsx      # Tabs layout (single screen)
-│   └── index.tsx        # Main Tasks screen (tabs, filters, list modals)
+│   └── index.tsx        # Main Tasks screen (orchestrates layout + modals)
 ├── _layout.tsx          # Root layout, theme, auth guard
-└── login.tsx             # Login screen
+└── login.tsx            # Login screen
 
 components/
 ├── task/                 # Task feature UI
 │   ├── add-list-modal.tsx
 │   ├── add-task-modal.tsx
+│   ├── add-task-to-list-modal.tsx   # Assign task to lists (from task item)
+│   ├── delete-list-confirm-modal.tsx
+│   ├── delete-task-confirm-modal.tsx
 │   ├── empty-state.tsx
 │   ├── floating-add-button.tsx
+│   ├── list-options-modal.tsx       # Rename / delete list actions
+│   ├── profile-modal.tsx            # Display name + avatar (from header)
+│   ├── rename-list-modal.tsx
 │   ├── search-and-filter-bar.tsx
-│   ├── task-item.tsx
+│   ├── task-item.tsx                # Task row + edit inline
 │   ├── task-list.tsx
-│   └── tasks-header.tsx
+│   ├── tasks-header.tsx             # Title + user menu
+│   └── tasks-tab-bar.tsx            # Filter tabs + list tabs + Add list
 └── ui/                   # Shared UI primitives
     ├── base-modal.tsx    # Reusable modal (overlay + card + title)
     └── toast.tsx
@@ -74,7 +81,7 @@ contexts/
 hooks/
 ├── use-color-scheme.ts
 ├── use-lists.ts          # List CRUD
-├── use-tasks.ts          # Task CRUD + list assignment
+├── use-tasks.ts          # Task CRUD + list assignment (useReducer)
 └── use-theme-color.ts
 
 types/
@@ -88,6 +95,16 @@ constants/
 └── theme.ts              # Light/dark colors, task color palette
 ```
 
+### Component separation
+
+UI is split so that **logic stays at the top** of each file and **large JSX blocks are moved into dedicated components**:
+
+- **Tasks screen** (`app/(tabs)/index.tsx`): Holds filter/list state and callbacks; renders `TasksTabBar`, `TaskList`, and list modals (`ListOptionsModal`, `RenameListModal`, `DeleteListConfirmModal`) instead of inline tabs and modal content.
+- **Task item** (`task-item.tsx`): Renders the task row and uses `AddTaskToListModal` and `DeleteTaskConfirmModal` for list assignment and delete confirmation instead of inline modals.
+- **Tasks header** (`tasks-header.tsx`): Renders the title, avatar, and user menu; profile form lives in `ProfileModal`.
+
+This keeps screens and feature components easier to read and test, with one clear place for state and handlers and smaller, reusable modal and tab components.
+
 ## Key dependencies
 
 - **Expo (SDK 54)**: tooling and runtime for React Native.
@@ -100,3 +117,11 @@ constants/
 - **@react-native-async-storage/async-storage**: session persistence for login.
 
 Task and list data are kept in memory only (no persistence). To persist tasks across sessions you could extend the hooks with AsyncStorage or another storage layer.
+
+### Why `useReducer` in `use-tasks.ts`
+
+Task state is managed with `useReducer` instead of `useState` plus multiple `useCallback` updaters for these reasons:
+
+- **Single source of transitions**: All task updates (add, toggle completion, delete, update title, add/remove from list, remove list from all tasks) live in one pure reducer. That makes it easier to reason about how state can change and to extend behaviour (e.g. persistence, undo, or logging) in one place.
+- **Pure reducer**: The reducer is a pure function `(state, action) => newState` with no side effects. Same inputs always produce the same output, which simplifies unit testing and debugging.
+- **Explicit actions**: Actions use clear names (e.g. `TOGGLE_TASK_COMPLETION`, `UPDATE_TASK_TITLE`) so the intent of each update is obvious and the codebase stays consistent.

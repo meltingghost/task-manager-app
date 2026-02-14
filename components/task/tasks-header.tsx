@@ -2,27 +2,11 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
 import type { ComponentProps } from 'react';
 import { useCallback, useState } from 'react';
-import {
-  Keyboard,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { ProfileModal } from '@/components/task/profile-modal';
 import { useAuth } from '@/contexts/auth-context';
 import { useThemeColor } from '@/hooks/use-theme-color';
-
-const AVATAR_ICONS: ComponentProps<typeof MaterialIcons>['name'][] = [
-  'person',
-  'face',
-  'account-circle',
-  'badge',
-  'psychology',
-  'school',
-];
 
 export interface TasksHeaderProps {
   onProfileSaved?: () => void;
@@ -37,7 +21,6 @@ export function TasksHeader({ onProfileSaved }: TasksHeaderProps = {}) {
   const cardBg = useThemeColor({}, 'card');
   const surfaceColor = useThemeColor({}, 'surface');
   const textColor = useThemeColor({}, 'text');
-  const iconColor = useThemeColor({}, 'icon');
 
   const [menuVisible, setMenuVisible] = useState(false);
   const [profileModalVisible, setProfileModalVisible] = useState(false);
@@ -57,7 +40,6 @@ export function TasksHeader({ onProfileSaved }: TasksHeaderProps = {}) {
   }, [userName, avatarIcon, closeMenu]);
 
   const closeProfileModal = useCallback(() => {
-    Keyboard.dismiss();
     setProfileModalVisible(false);
   }, []);
 
@@ -122,66 +104,15 @@ export function TasksHeader({ onProfileSaved }: TasksHeaderProps = {}) {
         </Pressable>
       </Modal>
 
-      <Modal
+      <ProfileModal
         visible={profileModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={closeProfileModal}
-      >
-        <Pressable style={styles.profileOverlay} onPress={closeProfileModal}>
-          <Pressable
-            style={[styles.profileCard, { backgroundColor: cardBg, borderColor }]}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <Text style={[styles.profileTitle, { color: textColor }]}>My Profile</Text>
-            <Text style={[styles.profileLabel, { color: iconColor }]}>Display name</Text>
-            <TextInput
-              style={[styles.profileInput, { color: textColor, borderColor, backgroundColor: surfaceColor }]}
-              placeholder="Your name"
-              placeholderTextColor={iconColor}
-              value={profileNameDraft}
-              onChangeText={setProfileNameDraft}
-              accessibilityLabel="Display name"
-            />
-            <Text style={[styles.profileLabel, { color: iconColor, marginTop: 16 }]}>Avatar icon</Text>
-            <View style={styles.iconRow}>
-              {AVATAR_ICONS.map((name) => (
-                <Pressable
-                  key={name}
-                  onPress={() => setProfileIconDraft(name)}
-                  style={[
-                    styles.iconOption,
-                    { borderColor },
-                    profileIconDraft === name && { backgroundColor: tintColor, borderColor: tintColor },
-                  ]}
-                  accessibilityLabel={`Select icon ${name}`}
-                  accessibilityRole="button"
-                >
-                  <MaterialIcons
-                    name={name}
-                    size={28}
-                    color={profileIconDraft === name ? '#fff' : textColor}
-                  />
-                </Pressable>
-              ))}
-            </View>
-            <View style={styles.profileActions}>
-              <Pressable
-                onPress={closeProfileModal}
-                style={({ pressed }) => [styles.profileButton, pressed && styles.menuItemPressed]}
-              >
-                <Text style={[styles.profileButtonText, { color: textColor }]}>Cancel</Text>
-              </Pressable>
-              <Pressable
-                onPress={saveProfile}
-                style={[styles.profileButton, styles.profileButtonPrimary, { backgroundColor: tintColor }]}
-              >
-                <Text style={styles.profileButtonPrimaryText}>Save</Text>
-              </Pressable>
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
+        nameDraft={profileNameDraft}
+        iconDraft={profileIconDraft}
+        onNameDraftChange={setProfileNameDraft}
+        onIconDraftChange={setProfileIconDraft}
+        onClose={closeProfileModal}
+        onSave={saveProfile}
+      />
     </View>
   );
 }
@@ -253,71 +184,6 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   menuItemText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  profileOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  profileCard: {
-    width: '100%',
-    maxWidth: 360,
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 24,
-  },
-  profileTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  profileLabel: {
-    fontSize: 14,
-    marginBottom: 8,
-  },
-  profileInput: {
-    fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderRadius: 8,
-  },
-  iconRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginTop: 8,
-  },
-  iconOption: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    borderWidth: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  profileActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 12,
-    marginTop: 24,
-  },
-  profileButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  profileButtonPrimary: {},
-  profileButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  profileButtonPrimaryText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },

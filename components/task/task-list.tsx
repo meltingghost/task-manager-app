@@ -10,7 +10,7 @@ import { TaskItem } from './task-item';
 export interface TaskListProps {
   tasks: Task[];
   lists: List[];
-  onToggle: (id: string) => void;
+  onToggleCompletion: (id: string) => void;
   onDelete: (id: string) => void;
   onUpdate?: (id: string, title: string) => void;
   onAddTaskToList: (taskId: string, listId: string) => void;
@@ -21,7 +21,7 @@ export interface TaskListProps {
 export function TaskList({
   tasks,
   lists,
-  onToggle,
+  onToggleCompletion,
   onDelete,
   onUpdate,
   onAddTaskToList,
@@ -33,7 +33,7 @@ export function TaskList({
       <TaskItem
         task={item}
         lists={lists}
-        onToggle={onToggle}
+        onToggleCompletion={onToggleCompletion}
         onDelete={onDelete}
         onUpdate={onUpdate}
         onAddTaskToList={onAddTaskToList}
@@ -41,7 +41,7 @@ export function TaskList({
         onShowToast={onShowToast}
       />
     ),
-    [lists, onToggle, onDelete, onUpdate, onAddTaskToList, onRemoveTaskFromList, onShowToast]
+    [lists, onToggleCompletion, onDelete, onUpdate, onAddTaskToList, onRemoveTaskFromList, onShowToast]
   );
 
   return (

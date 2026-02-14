@@ -1,16 +1,11 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Haptics from 'expo-haptics';
 import React, { useCallback, useMemo, useState } from 'react';
-import {
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
+import { AddTaskToListModal } from '@/components/task/add-task-to-list-modal';
+import { DeleteTaskConfirmModal } from '@/components/task/delete-task-confirm-modal';
 import { ThemedText } from '@/components/themed-text';
 import { TASK_COLORS } from '@/constants/theme';
 import { useThemeColor } from '@/hooks/use-theme-color';
@@ -22,7 +17,7 @@ const defaultTaskColor = TASK_COLORS[0].hex;
 export interface TaskItemProps {
   task: Task;
   lists: List[];
-  onToggle: (id: string) => void;
+  onToggleCompletion: (id: string) => void;
   onDelete: (id: string) => void;
   onUpdate?: (id: string, title: string) => void;
   onAddTaskToList: (taskId: string, listId: string) => void;
@@ -33,7 +28,7 @@ export interface TaskItemProps {
 function TaskItemComponent({
   task,
   lists,
-  onToggle,
+  onToggleCompletion,
   onDelete,
   onUpdate,
   onAddTaskToList,
@@ -42,11 +37,8 @@ function TaskItemComponent({
 }: TaskItemProps) {
   const iconColor = useThemeColor({}, 'icon');
   const tintColor = useThemeColor({}, 'tint');
-  const exitColor = useThemeColor({}, 'exit');
   const textColor = useThemeColor({}, 'text');
   const borderColor = useThemeColor({}, 'border');
-  const cardBg = useThemeColor({}, 'card');
-  const surfaceColor = useThemeColor({}, 'surface');
 
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(task.title);
@@ -93,10 +85,10 @@ function TaskItemComponent({
     setIsEditing(false);
   }, [task.title]);
 
-  const handleToggle = useCallback(() => {
+  const handleToggleCompletion = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onToggle(task.id);
-  }, [task.id, onToggle]);
+    onToggleCompletion(task.id);
+  }, [task.id, onToggleCompletion]);
 
   const taskColor = task.color ?? defaultTaskColor;
 
@@ -138,7 +130,7 @@ function TaskItemComponent({
     <Animated.View entering={FadeIn.duration(200)} style={[styles.row, styles.rowBorder, { borderBottomColor: borderColor }]}>
       <View style={[styles.colorBar, { backgroundColor: taskColor }]} />
       <Pressable
-        onPress={handleToggle}
+        onPress={handleToggleCompletion}
         style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
         accessibilityLabel={task.completed ? 'Mark as incomplete' : 'Mark as complete'}
         accessibilityRole="button"
@@ -194,123 +186,19 @@ function TaskItemComponent({
         <MaterialIcons name="delete-outline" size={24} color={iconColor} />
       </Pressable>
 
-      <Modal
+      <AddTaskToListModal
         visible={listModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setListModalVisible(false)}
-      >
-        <Pressable
-          style={styles.listModalOverlay}
-          onPress={() => setListModalVisible(false)}
-        >
-          <Pressable
-            style={[styles.listModalCard, { backgroundColor: cardBg, borderColor }]}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <ThemedText style={[styles.listModalTitle, { color: textColor }]}>
-              Add to list
-            </ThemedText>
-            {lists.length === 0 ? (
-              <ThemedText style={[styles.listModalEmpty, { color: iconColor }]}>
-                No lists yet. Create one from the tabs.
-              </ThemedText>
-            ) : (
-              <ScrollView
-                style={styles.listModalScroll}
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={false}
-              >
-                {lists.map((list) => {
-                  const isInList = taskListIds.includes(list.id);
-                  return (
-                    <Pressable
-                      key={list.id}
-                      onPress={() => toggleTaskList(list.id)}
-                      style={({ pressed }) => [
-                        styles.listModalRow,
-                        { borderBottomColor: borderColor },
-                        pressed && styles.pressed,
-                      ]}
-                      accessibilityLabel={`${list.name}. ${isInList ? 'In list. Tap to remove.' : 'Not in list. Tap to add.'}`}
-                      accessibilityRole="button"
-                    >
-                      <ThemedText
-                        style={[styles.listModalRowText, { color: textColor }]}
-                        numberOfLines={1}
-                      >
-                        {list.name}
-                      </ThemedText>
-                      <MaterialIcons
-                        name={isInList ? 'check-circle' : 'radio-button-unchecked'}
-                        size={24}
-                        color={isInList ? tintColor : iconColor}
-                      />
-                    </Pressable>
-                  );
-                })}
-              </ScrollView>
-            )}
-            <Pressable
-              onPress={() => setListModalVisible(false)}
-              style={[styles.listModalDone, { backgroundColor: surfaceColor }]}
-            >
-              <ThemedText style={[styles.listModalDoneText, { color: textColor }]}>
-                Done
-              </ThemedText>
-            </Pressable>
-          </Pressable>
-        </Pressable>
-      </Modal>
+        lists={lists}
+        taskListIds={taskListIds}
+        onToggleList={toggleTaskList}
+        onClose={() => setListModalVisible(false)}
+      />
 
-      <Modal
+      <DeleteTaskConfirmModal
         visible={deleteModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={closeDeleteModal}
-      >
-        <Pressable style={styles.listModalOverlay} onPress={closeDeleteModal}>
-          <Pressable
-            style={[styles.listModalCard, { backgroundColor: cardBg, borderColor }]}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <ThemedText style={[styles.listModalTitle, { color: textColor }]}>
-              Delete task
-            </ThemedText>
-            <ThemedText style={[styles.deleteConfirmMessage, { color: textColor }]}>
-              Are you sure you want to delete this task?
-              This action cannot be undone.
-            </ThemedText>
-            <View style={styles.deleteConfirmActions}>
-              <Pressable
-                onPress={closeDeleteModal}
-                style={({ pressed }) => [
-                  styles.deleteConfirmButton,
-                  { backgroundColor: surfaceColor },
-                  pressed && styles.pressed,
-                ]}
-              >
-                <ThemedText style={[styles.deleteConfirmButtonText, { color: textColor }]}>
-                  Cancel
-                </ThemedText>
-              </Pressable>
-              <Pressable
-                onPress={confirmDelete}
-                style={({ pressed }) => [
-                  styles.deleteConfirmButton,
-                  styles.deleteConfirmButtonDanger,
-                  { backgroundColor: exitColor },
-                  pressed && styles.pressed,
-                ]}
-              >
-                <ThemedText style={styles.deleteConfirmButtonDangerText}>
-                  Delete
-                </ThemedText>
-              </Pressable>
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
+        onClose={closeDeleteModal}
+        onConfirm={confirmDelete}
+      />
     </Animated.View>
   );
 }
@@ -364,83 +252,5 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 0,
     minWidth: 0,
-  },
-  listModalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  listModalCard: {
-    width: '100%',
-    maxWidth: 320,
-    maxHeight: '70%',
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 20,
-  },
-  listModalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 16,
-  },
-  listModalEmpty: {
-    fontSize: 14,
-    marginBottom: 16,
-  },
-  listModalScroll: {
-    maxHeight: 240,
-    marginHorizontal: -4,
-  },
-  listModalRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-  },
-  listModalRowText: {
-    flex: 1,
-    fontSize: 16,
-    marginRight: 12,
-  },
-  listModalDone: {
-    marginTop: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  listModalDoneText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  deleteConfirmMessage: {
-    fontSize: 15,
-    marginBottom: 20,
-    lineHeight: 22,
-  },
-  deleteConfirmActions: {
-    flexDirection: 'row',
-    gap: 12,
-    justifyContent: 'flex-end',
-  },
-  deleteConfirmButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    minWidth: 100,
-    alignItems: 'center',
-  },
-  deleteConfirmButtonDanger: {},
-  deleteConfirmButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  deleteConfirmButtonDangerText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
   },
 });
