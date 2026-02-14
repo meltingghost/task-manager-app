@@ -1,7 +1,12 @@
-import { createContext, useCallback, useContext, useState } from 'react';
+// eslint-disable-next-line import/no-unresolved -- AsyncStorage is a runtime dependency
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+
+const AUTH_STORAGE_KEY = '@task_manager_authenticated';
 
 interface AuthContextValue {
   isAuthenticated: boolean;
+  isLoading: boolean;
   signIn: () => void;
   signOut: () => void;
 }
@@ -10,12 +15,27 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const signIn = useCallback(() => setIsAuthenticated(true), []);
-  const signOut = useCallback(() => setIsAuthenticated(false), []);
+  useEffect(() => {
+    AsyncStorage.getItem(AUTH_STORAGE_KEY).then((value: string | null) => {
+      setIsAuthenticated(value === 'true');
+      setIsLoading(false);
+    });
+  }, []);
+
+  const signIn = useCallback(() => {
+    setIsAuthenticated(true);
+    AsyncStorage.setItem(AUTH_STORAGE_KEY, 'true');
+  }, []);
+
+  const signOut = useCallback(() => {
+    setIsAuthenticated(false);
+    AsyncStorage.removeItem(AUTH_STORAGE_KEY);
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, signIn, signOut }}>
+    <AuthContext.Provider value={{ isAuthenticated, isLoading, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

@@ -50,6 +50,15 @@ export function useTasks() {
     );
   }, []);
 
+  const removeListFromAllTasks = useCallback((listId: string) => {
+    setTasks((prev) =>
+      prev.map((t) => ({
+        ...t,
+        listIds: (t.listIds ?? []).filter((id) => id !== listId),
+      }))
+    );
+  }, []);
+
   const toggleTask = useCallback((id: string) => {
     setTasks((prev) =>
       prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
@@ -76,5 +85,6 @@ export function useTasks() {
     updateTask,
     addTaskToList,
     removeTaskFromList,
+    removeListFromAllTasks,
   };
 }

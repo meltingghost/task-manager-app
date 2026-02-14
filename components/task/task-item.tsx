@@ -77,7 +77,7 @@ function TaskItemComponent({
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     onDelete(task.id);
     closeDeleteModal();
-    onShowToast?.('Tarea eliminada');
+    onShowToast?.('Task deleted');
   }, [task.id, onDelete, closeDeleteModal, onShowToast]);
 
   const handleSaveEdit = useCallback(() => {
@@ -149,22 +149,34 @@ function TaskItemComponent({
           color={task.completed ? tintColor : iconColor}
         />
       </Pressable>
-      <Pressable
-        style={styles.titleWrap}
-        onLongPress={() => onUpdate && setIsEditing(true)}
-        accessibilityLabel={`Task: ${task.title}. ${task.completed ? 'Completed.' : 'Pending.'}`}
-        accessibilityRole="none"
-      >
-        <ThemedText
-          style={[
-            styles.title,
-            task.completed && styles.titleCompleted,
-          ]}
-          numberOfLines={2}
+      <View style={styles.titleRow}>
+        <Pressable
+          style={styles.titleWrap}
+          onLongPress={() => onUpdate && setIsEditing(true)}
+          accessibilityLabel={`Task: ${task.title}. ${task.completed ? 'Completed.' : 'Pending.'}`}
+          accessibilityRole="none"
         >
-          {task.title}
-        </ThemedText>
-      </Pressable>
+          <ThemedText
+            style={[
+              styles.title,
+              task.completed && styles.titleCompleted,
+            ]}
+            numberOfLines={2}
+          >
+            {task.title}
+          </ThemedText>
+        </Pressable>
+        {onUpdate && (
+          <Pressable
+            onPress={() => setIsEditing(true)}
+            style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
+            accessibilityLabel="Edit task name"
+            accessibilityRole="button"
+          >
+            <MaterialIcons name="edit" size={22} color={iconColor} />
+          </Pressable>
+        )}
+      </View>
       <Pressable
         onPress={() => setListModalVisible(true)}
         style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
@@ -327,6 +339,13 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.7,
+  },
+  titleRow: {
+    flex: 1,
+    minWidth: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   titleWrap: {
     flex: 1,

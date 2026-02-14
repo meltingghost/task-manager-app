@@ -12,11 +12,12 @@ export const unstable_settings = {
 };
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
+    if (isLoading) return;
     // Defer redirect until after the Stack navigator has mounted
     const timer = setTimeout(() => {
       const inLogin = segments[0] === 'login';
@@ -27,7 +28,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
       }
     }, 0);
     return () => clearTimeout(timer);
-  }, [isAuthenticated, segments, router]);
+  }, [isAuthenticated, isLoading, segments, router]);
 
   return <>{children}</>;
 }

@@ -1,61 +1,69 @@
 # Task Manager App
 
-Aplicación de gestión de tareas desarrollada con React Native (Expo). Permite añadir tareas, marcarlas como completadas, editarlas y eliminarlas, con filtros por estado y soporte para tema claro/oscuro.
+A task management app built with React Native (Expo). Add tasks, mark them complete, edit and delete them, with filters by status, custom lists, and light/dark theme support.
 
-## Requisitos
+## Requirements
 
-- Node.js (v18 o superior recomendado)
-- npm o yarn
-- [Expo Go](https://expo.dev/go) (opcional, para probar en dispositivo físico)
+- Node.js (v18 or higher recommended)
+- npm or yarn
+- [Expo Go](https://expo.dev/go) (optional, for testing on a physical device)
 
-## Cómo ejecutar
+## How to run
 
-1. Instalar dependencias:
+1. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. Iniciar el proyecto:
+2. Start the project:
 
    ```bash
    npx expo start
    ```
 
-3. Abrir la app:
-   - **iOS**: pulsar `i` en la terminal o escanear el QR con la cámara.
-   - **Android**: pulsar `a` en la terminal o escanear el QR con Expo Go.
-   - **Web**: pulsar `w` en la terminal.
+3. Open the app:
+   - **iOS**: press `i` in the terminal or scan the QR code with the camera.
+   - **Android**: press `a` in the terminal or scan the QR code with Expo Go.
+   - **Web**: press `w` in the terminal.
 
-## Funcionalidades
+## Features
 
-- **Añadir tarea**: campo de texto y botón "Añadir"; se puede enviar también con Intro.
-- **Marcar como completada**: tocar el icono circular junto a la tarea; las completadas se muestran tachadas y con check.
-- **Eliminar tarea**: tocar el icono de papelera; se muestra confirmación antes de borrar.
-- **Editar tarea**: mantener pulsado el texto de la tarea para entrar en modo edición; guardar o cancelar.
-- **Filtros**: pestañas "Todas", "Pendientes" y "Hechas" para filtrar la lista.
-- **Tema**: la app respeta el tema claro/oscuro del sistema.
-- **Feedback háptico**: al marcar completada y al eliminar (en dispositivos compatibles).
-- **Animaciones**: entrada suave al añadir una nueva tarea (Reanimated).
+- **Add task**: FAB opens a modal with title and color picker; new tasks can be assigned to a list.
+- **Mark as complete**: tap the circle icon next to the task; completed tasks show with a check and strikethrough.
+- **Delete task**: tap the trash icon; a confirmation modal appears before deleting.
+- **Edit task**: tap the edit icon next to the title or long-press the title to enter edit mode; save or cancel.
+- **Add to list**: assign a task to one or more user-created lists via the list icon; tasks can belong to multiple lists.
+- **Filters**: "Everything", "Undone", and "Done" tabs, plus one tab per custom list.
+- **Custom lists**: create lists from the "Add List" tab; long-press a list tab to rename or delete it.
+- **Search and color filter**: search by task title and filter by task color.
+- **Theme**: app follows the system light/dark theme.
+- **Login**: simple login screen; session is persisted so reloads do not log you out (logout only when you tap Logout).
+- **Profile**: set display name and avatar icon from the header menu; title shows "[Name]'s Tasks" when set.
+- **Haptic feedback**: when toggling tasks, deleting, and on supported devices.
+- **Animations**: smooth entry when adding a new task (Reanimated).
+- **Toasts**: success messages when creating/editing/deleting tasks, lists, and profile.
 
-## Estructura del proyecto
+## Project structure
 
-- `types/task.ts`: tipo e interfaz de una tarea.
-- `hooks/use-tasks.ts`: hook con el estado de las tareas y las acciones (añadir, completar, eliminar, actualizar).
-- `components/task/`: componentes de la lista de tareas:
-  - `add-task-input.tsx`: input y botón para añadir.
-  - `task-item.tsx`: fila de una tarea (checkbox, título, edición, borrar).
-  - `task-list.tsx`: lista con `FlatList` y estado vacío.
-- `app/(tabs)/index.tsx`: pantalla principal (Tareas) con filtros y uso del hook.
+- `types/task.ts`, `types/list.ts`: task and list types.
+- `hooks/use-tasks.ts`: task state and actions (add, toggle, delete, update, add/remove from list).
+- `hooks/use-lists.ts`: list state and actions (add, update, delete).
+- `contexts/auth-context.tsx`: auth state with AsyncStorage persistence.
+- `components/task/`: task UI (task-item, task-list, add-task-modal, add-list-modal, tasks-header, search-and-filter-bar, empty-state, floating-add-button).
+- `app/(tabs)/index.tsx`: main Tasks screen with tabs, filters, and modals.
+- `app/login.tsx`: login screen.
+- `constants/theme.ts`: light/dark colors and task color palette.
 
-## Dependencias destacadas
+## Key dependencies
 
-- **Expo (SDK 54)**: entorno y herramientas para React Native.
-- **React Native**: framework de UI.
-- **TypeScript**: tipado estático.
-- **Expo Router**: enrutamiento basado en archivos (carpeta `app/`).
-- **react-native-reanimated**: animaciones de entrada para las tareas.
-- **expo-haptics**: feedback háptico al completar y eliminar.
-- **@expo/vector-icons**: iconos (Material Icons) en la interfaz.
+- **Expo (SDK 54)**: tooling and runtime for React Native.
+- **React Native**: UI framework.
+- **TypeScript**: static typing.
+- **Expo Router**: file-based routing (`app/` directory).
+- **react-native-reanimated**: entry animations for tasks.
+- **expo-haptics**: haptic feedback on complete and delete.
+- **@expo/vector-icons**: icons (Material Icons) in the UI.
+- **@react-native-async-storage/async-storage**: session persistence for login.
 
-El estado de las tareas es solo en memoria (no hay persistencia). Para guardar entre sesiones se podría extender el hook con `expo-secure-store` o `AsyncStorage`.
+Task and list data are kept in memory only (no persistence). To persist tasks across sessions you could extend the hooks with AsyncStorage or another storage layer.
