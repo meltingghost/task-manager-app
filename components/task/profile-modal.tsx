@@ -51,10 +51,16 @@ export function ProfileModal({
       animationType="fade"
       onRequestClose={handleClose}
     >
-      <Pressable style={styles.overlay} onPress={handleClose}>
+      <Pressable
+        style={styles.overlay}
+        onPress={handleClose}
+        accessibilityLabel="Close modal"
+        accessibilityRole="button"
+      >
         <Pressable
           style={[styles.card, { backgroundColor: cardBg, borderColor }]}
           onPress={(e) => e.stopPropagation()}
+          accessibilityRole="none"
         >
           <Text style={[styles.title, { color: textColor }]}>My Profile</Text>
           <Text style={[styles.label, { color: iconColor }]}>Display name</Text>
@@ -92,12 +98,16 @@ export function ProfileModal({
             <Pressable
               onPress={handleClose}
               style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+              accessibilityLabel="Cancel"
+              accessibilityRole="button"
             >
               <Text style={[styles.buttonText, { color: textColor }]}>Cancel</Text>
             </Pressable>
             <Pressable
               onPress={onSave}
               style={[styles.button, styles.buttonPrimary, { backgroundColor: tintColor }]}
+              accessibilityLabel="Save profile"
+              accessibilityRole="button"
             >
               <Text style={styles.buttonPrimaryText}>Save</Text>
             </Pressable>

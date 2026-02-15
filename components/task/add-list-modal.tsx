@@ -51,10 +51,16 @@ export function AddListModal({ visible, onClose, onCreateList, onListCreated }: 
       animationType="fade"
       onRequestClose={handleClose}
     >
-      <Pressable style={styles.overlay} onPress={handleClose}>
+      <Pressable
+        style={styles.overlay}
+        onPress={handleClose}
+        accessibilityLabel="Close modal"
+        accessibilityRole="button"
+      >
         <Pressable
           style={[styles.content, { backgroundColor: cardBg, borderColor }]}
           onPress={(e) => e.stopPropagation()}
+          accessibilityRole="none"
         >
           <ThemedText type="title" style={styles.title}>
             Add List
@@ -71,6 +77,8 @@ export function AddListModal({ visible, onClose, onCreateList, onListCreated }: 
             <Pressable
               onPress={handleClose}
               style={({ pressed }) => [styles.button, pressed && styles.pressed]}
+              accessibilityLabel="Close"
+              accessibilityRole="button"
             >
               <ThemedText type="defaultSemiBold">Close</ThemedText>
             </Pressable>
@@ -83,6 +91,9 @@ export function AddListModal({ visible, onClose, onCreateList, onListCreated }: 
                 { backgroundColor: tintColor },
                 !canCreate && styles.buttonDisabled,
               ]}
+              accessibilityLabel="Create list"
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !canCreate }}
             >
               <ThemedText style={styles.createButtonText}>Create</ThemedText>
             </Pressable>

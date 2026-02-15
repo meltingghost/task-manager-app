@@ -54,8 +54,17 @@ export function AddTaskModal({ visible, onClose, onSubmit, onTaskAdded }: AddTas
       animationType="fade"
       onRequestClose={handleClose}
     >
-      <Pressable style={styles.overlay} onPress={handleClose}>
-        <Pressable style={[styles.content, { backgroundColor: cardBg, borderColor }]} onPress={(e) => e.stopPropagation()}>
+      <Pressable
+        style={styles.overlay}
+        onPress={handleClose}
+        accessibilityLabel="Close modal"
+        accessibilityRole="button"
+      >
+        <Pressable
+          style={[styles.content, { backgroundColor: cardBg, borderColor }]}
+          onPress={(e) => e.stopPropagation()}
+          accessibilityRole="none"
+        >
           <ThemedText type="title" style={styles.title}>
             Add task
           </ThemedText>
@@ -94,6 +103,8 @@ export function AddTaskModal({ visible, onClose, onSubmit, onTaskAdded }: AddTas
             <Pressable
               onPress={handleClose}
               style={({ pressed }) => [styles.button, styles.cancelButton, pressed && styles.pressed]}
+              accessibilityLabel="Cancel"
+              accessibilityRole="button"
             >
               <ThemedText type="defaultSemiBold">Cancel</ThemedText>
             </Pressable>
@@ -105,6 +116,9 @@ export function AddTaskModal({ visible, onClose, onSubmit, onTaskAdded }: AddTas
                 { backgroundColor: tintColor },
                 !canSubmit && styles.buttonDisabled,
               ]}
+              accessibilityLabel="Add task"
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !canSubmit }}
             >
               <ThemedText style={styles.addButtonText}>Add</ThemedText>
             </Pressable>

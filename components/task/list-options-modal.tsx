@@ -32,6 +32,8 @@ export function ListOptionsModal({
       <Pressable
         onPress={() => onRename(list)}
         style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}
+        accessibilityLabel="Rename list"
+        accessibilityRole="button"
       >
         <MaterialIcons name="edit" size={22} color={iconColor} />
         <ThemedText style={[styles.optionText, { color: textColor }]}>Rename list</ThemedText>
@@ -39,6 +41,8 @@ export function ListOptionsModal({
       <Pressable
         onPress={() => onDelete(list)}
         style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}
+        accessibilityLabel="Delete list"
+        accessibilityRole="button"
       >
         <MaterialIcons name="delete-outline" size={22} color={exitColor} />
         <ThemedText style={[styles.optionText, { color: exitColor }]}>Delete list</ThemedText>

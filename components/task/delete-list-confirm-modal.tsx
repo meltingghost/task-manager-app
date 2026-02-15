@@ -35,6 +35,8 @@ export function DeleteListConfirmModal({
             { backgroundColor: surfaceColor },
             pressed && styles.buttonPressed,
           ]}
+          accessibilityLabel="Cancel"
+          accessibilityRole="button"
         >
           <ThemedText style={[styles.buttonText, { color: textColor }]}>Cancel</ThemedText>
         </Pressable>
@@ -45,6 +47,8 @@ export function DeleteListConfirmModal({
             { backgroundColor: exitColor },
             pressed && styles.buttonPressed,
           ]}
+          accessibilityLabel="Delete list"
+          accessibilityRole="button"
         >
           <ThemedText style={styles.buttonPrimaryText}>Delete</ThemedText>
         </Pressable>

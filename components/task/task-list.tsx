@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { FlatList, ListRenderItem, StyleSheet } from 'react-native';
 
 import type { List } from '@/types/list';
@@ -6,6 +6,11 @@ import type { Task } from '@/types/task';
 
 import { EmptyState } from './empty-state';
 import { TaskItem } from './task-item';
+
+/** Incomplete tasks first, completed tasks last. Relative order within each group is preserved. */
+function sortIncompleteFirst(tasks: Task[]): Task[] {
+  return [...tasks].sort((a, b) => Number(a.completed) - Number(b.completed));
+}
 
 export interface TaskListProps {
   tasks: Task[];
@@ -28,6 +33,8 @@ export function TaskList({
   onRemoveTaskFromList,
   onShowToast,
 }: TaskListProps) {
+  const sortedTasks = useMemo(() => sortIncompleteFirst(tasks), [tasks]);
+
   const renderItem: ListRenderItem<Task> = useCallback(
     ({ item }) => (
       <TaskItem
@@ -46,11 +53,11 @@ export function TaskList({
 
   return (
     <FlatList
-      data={tasks}
+      data={sortedTasks}
       keyExtractor={(item) => item.id}
       renderItem={renderItem}
       ListEmptyComponent={EmptyState}
-      contentContainerStyle={tasks.length === 0 ? styles.emptyContainer : undefined}
+      contentContainerStyle={sortedTasks.length === 0 ? styles.emptyContainer : undefined}
       keyboardShouldPersistTaps="handled"
     />
   );

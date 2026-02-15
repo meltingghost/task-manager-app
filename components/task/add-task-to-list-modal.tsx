@@ -34,10 +34,16 @@ export function AddTaskToListModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <Pressable style={styles.overlay} onPress={onClose}>
+      <Pressable
+        style={styles.overlay}
+        onPress={onClose}
+        accessibilityLabel="Close modal"
+        accessibilityRole="button"
+      >
         <Pressable
           style={[styles.card, { backgroundColor: cardBg, borderColor }]}
           onPress={(e) => e.stopPropagation()}
+          accessibilityRole="none"
         >
           <ThemedText style={[styles.title, { color: textColor }]}>Add to list</ThemedText>
           {lists.length === 0 ? (
@@ -83,6 +89,8 @@ export function AddTaskToListModal({
           <Pressable
             onPress={onClose}
             style={[styles.doneButton, { backgroundColor: surfaceColor }]}
+            accessibilityLabel="Done"
+            accessibilityRole="button"
           >
             <ThemedText style={[styles.doneText, { color: textColor }]}>Done</ThemedText>
           </Pressable>

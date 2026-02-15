@@ -23,10 +23,16 @@ export function BaseModal({ visible, onClose, title, children }: BaseModalProps)
       animationType="fade"
       onRequestClose={onClose}
     >
-      <Pressable style={styles.overlay} onPress={onClose}>
+      <Pressable
+        style={styles.overlay}
+        onPress={onClose}
+        accessibilityLabel="Close modal"
+        accessibilityRole="button"
+      >
         <Pressable
           style={[styles.card, { backgroundColor: cardBg, borderColor }]}
           onPress={(e) => e.stopPropagation()}
+          accessibilityRole="none"
         >
           <ThemedText style={[styles.title, { color: textColor }]}>{title}</ThemedText>
           <View style={styles.content}>{children}</View>

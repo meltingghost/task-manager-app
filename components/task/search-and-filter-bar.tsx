@@ -69,6 +69,8 @@ export function SearchAndFilterBar({
         <Pressable
           style={[styles.colorModalOverlay, { backgroundColor: overlayBg }]}
           onPress={() => setColorModalVisible(false)}
+          accessibilityLabel="Close modal"
+          accessibilityRole="button"
         >
           <View style={[styles.colorModalContent, { backgroundColor: cardBg, borderColor }]}>
             <ThemedText style={styles.colorModalTitle}>Filter by color</ThemedText>
@@ -81,6 +83,9 @@ export function SearchAndFilterBar({
                 styles.colorOption,
                 selectedColorFilter === null && { backgroundColor: tintColor },
               ]}
+              accessibilityLabel="All colors"
+              accessibilityRole="button"
+              accessibilityState={{ selected: selectedColorFilter === null }}
             >
               <ThemedText style={selectedColorFilter === null ? styles.colorOptionTextActive : undefined}>
                 All colors
@@ -97,6 +102,9 @@ export function SearchAndFilterBar({
                   styles.colorOptionRow,
                   selectedColorFilter === hex && { backgroundColor: tintColor },
                 ]}
+                accessibilityLabel={`Filter by ${name}`}
+                accessibilityRole="button"
+                accessibilityState={{ selected: selectedColorFilter === hex }}
               >
                 <View style={[styles.colorOptionChip, { backgroundColor: hex }]} />
                 <ThemedText

@@ -27,10 +27,16 @@ export function DeleteTaskConfirmModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <Pressable style={styles.overlay} onPress={onClose}>
+      <Pressable
+        style={styles.overlay}
+        onPress={onClose}
+        accessibilityLabel="Close modal"
+        accessibilityRole="button"
+      >
         <Pressable
           style={[styles.card, { backgroundColor: cardBg, borderColor }]}
           onPress={(e) => e.stopPropagation()}
+          accessibilityRole="none"
         >
           <ThemedText style={[styles.title, { color: textColor }]}>Delete task</ThemedText>
           <ThemedText style={[styles.message, { color: textColor }]}>
@@ -45,6 +51,8 @@ export function DeleteTaskConfirmModal({
                 { backgroundColor: surfaceColor },
                 pressed && styles.pressed,
               ]}
+              accessibilityLabel="Cancel"
+              accessibilityRole="button"
             >
               <ThemedText style={[styles.buttonText, { color: textColor }]}>Cancel</ThemedText>
             </Pressable>
@@ -56,6 +64,8 @@ export function DeleteTaskConfirmModal({
                 { backgroundColor: exitColor },
                 pressed && styles.pressed,
               ]}
+              accessibilityLabel="Delete task"
+              accessibilityRole="button"
             >
               <ThemedText style={styles.buttonDangerText}>Delete</ThemedText>
             </Pressable>

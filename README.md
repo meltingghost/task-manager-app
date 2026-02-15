@@ -105,6 +105,17 @@ UI is split so that **logic stays at the top** of each file and **large JSX bloc
 
 This keeps screens and feature components easier to read and test, with one clear place for state and handlers and smaller, reusable modal and tab components.
 
+### Accessibility
+
+The app uses React Native’s accessibility APIs so it works well with screen readers and other assistive technologies:
+
+- **Labels and roles**: Interactive elements (buttons, links, inputs) have `accessibilityLabel` and `accessibilityRole` so their purpose is announced clearly (e.g. “Mark as complete”, “Delete task”, “Add task”).
+- **State**: Where relevant, `accessibilityState` is used for `selected` and `disabled`, so filter tabs, color options, and disabled submit buttons are announced correctly.
+- **Modals**: Modal overlays that close on tap have a “Close modal” label; content that only stops propagation uses `accessibilityRole="none"` to avoid duplicate focus targets.
+- **Empty state**: The empty list view uses a single labelled container with `accessibilityRole="summary"` and hides decorative children from the accessibility tree to avoid redundant announcements.
+
+This was done so that users who rely on screen readers or other accessibility tools can navigate the app, understand controls, and complete the same actions as everyone else, without depending on visual layout or icon recognition alone.
+
 ## Key dependencies
 
 - **Expo (SDK 54)**: tooling and runtime for React Native.

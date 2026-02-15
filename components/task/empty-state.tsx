@@ -8,9 +8,9 @@ export function EmptyState() {
   const iconColor = useThemeColor({}, 'icon');
 
   return (
-    <View style={styles.container}>
-      <MaterialIcons name="assignment" size={72} color={iconColor} style={styles.icon} />
-      <ThemedText style={styles.text}>No tasks yet</ThemedText>
+    <View style={styles.container} accessibilityLabel="No tasks yet" accessibilityRole="summary">
+      <MaterialIcons name="assignment" size={72} color={iconColor} style={styles.icon} accessibilityElementsHidden />
+      <ThemedText style={styles.text} accessibilityElementsHidden>No tasks yet</ThemedText>
     </View>
   );
 }

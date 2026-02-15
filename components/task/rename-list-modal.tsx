@@ -48,6 +48,8 @@ export function RenameListModal({
             { backgroundColor: surfaceColor },
             pressed && styles.buttonPressed,
           ]}
+          accessibilityLabel="Cancel"
+          accessibilityRole="button"
         >
           <ThemedText style={[styles.buttonText, { color: textColor }]}>Cancel</ThemedText>
         </Pressable>
@@ -60,6 +62,9 @@ export function RenameListModal({
             !draft.trim() && styles.buttonDisabled,
             pressed && styles.buttonPressed,
           ]}
+          accessibilityLabel="Save list name"
+          accessibilityRole="button"
+          accessibilityState={{ disabled: !draft.trim() }}
         >
           <ThemedText style={styles.buttonPrimaryText}>Save</ThemedText>
         </Pressable>
