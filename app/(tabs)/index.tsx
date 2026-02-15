@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
-import { Keyboard, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import { AddListModal } from '@/components/task/add-list-modal';
 import { AddTaskModal } from '@/components/task/add-task-modal';
@@ -13,15 +13,12 @@ import { TasksHeader } from '@/components/task/tasks-header';
 import { TasksTabBar } from '@/components/task/tasks-tab-bar';
 import { ThemedView } from '@/components/themed-view';
 import { Toast } from '@/components/ui/toast';
+import { useListModals } from '@/hooks/use-list-modals';
 import { useLists } from '@/hooks/use-lists';
 import { useTasks } from '@/hooks/use-tasks';
-import type { List } from '@/types/list';
-import {
-  filterTasks,
-  isTaskFilter,
-  type TabFilter,
-  type TaskFilter,
-} from '@/utils/task-filters';
+import { useTasksFilter } from '@/hooks/use-tasks-filter';
+import { useToast } from '@/hooks/use-toast';
+import type { TabFilter, TaskFilter } from '@/utils/task-filters';
 
 export type { TabFilter, TaskFilter };
 
@@ -37,67 +34,28 @@ export default function TasksScreen() {
     removeListFromAllTasks,
   } = useTasks();
   const { lists, addList, updateList, deleteList } = useLists();
-  const [filter, setFilter] = useState<TabFilter>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [colorFilter, setColorFilter] = useState<string | null>(null);
+  const { visible: toastVisible, message: toastMessage, showToast, dismissToast } = useToast();
+  const {
+    filter,
+    setFilter,
+    searchQuery,
+    setSearchQuery,
+    colorFilter,
+    setColorFilter,
+    filteredTasks,
+    currentListId,
+  } = useTasksFilter(tasks);
+  const listModals = useListModals({
+    updateList,
+    deleteList,
+    removeListFromAllTasks,
+    showToast,
+    filter,
+    setFilter,
+  });
+
   const [addTaskModalVisible, setAddTaskModalVisible] = useState(false);
   const [addListModalVisible, setAddListModalVisible] = useState(false);
-  const [listOptionsList, setListOptionsList] = useState<List | null>(null);
-  const [renameList, setRenameList] = useState<List | null>(null);
-  const [renameDraft, setRenameDraft] = useState('');
-  const [deleteListConfirm, setDeleteListConfirm] = useState<List | null>(null);
-  const [toast, setToast] = useState({ visible: false, message: '' });
-
-  const showToast = useCallback((message: string) => {
-    setToast({ visible: true, message });
-  }, []);
-
-  const dismissToast = useCallback(() => {
-    setToast((prev) => ({ ...prev, visible: false }));
-  }, []);
-
-  const filteredTasks = useMemo(
-    () => filterTasks({ tasks, filter, searchQuery, colorFilter }),
-    [tasks, filter, searchQuery, colorFilter]
-  );
-
-  const currentListId = isTaskFilter(filter) ? undefined : filter;
-
-  const openListOptions = useCallback((list: List) => setListOptionsList(list), []);
-  const closeListOptions = useCallback(() => setListOptionsList(null), []);
-
-  const openRenameList = useCallback((list: List) => {
-    setListOptionsList(null);
-    setRenameList(list);
-    setRenameDraft(list.name);
-  }, []);
-  const closeRenameList = useCallback(() => {
-    Keyboard.dismiss();
-    setRenameList(null);
-    setRenameDraft('');
-  }, []);
-  const saveRenameList = useCallback(() => {
-    if (renameList && renameDraft.trim()) {
-      updateList(renameList.id, renameDraft.trim());
-      showToast('List renamed');
-      closeRenameList();
-    }
-  }, [renameList, renameDraft, updateList, showToast, closeRenameList]);
-
-  const openDeleteListConfirm = useCallback((list: List) => {
-    setListOptionsList(null);
-    setDeleteListConfirm(list);
-  }, []);
-  const closeDeleteListConfirm = useCallback(() => setDeleteListConfirm(null), []);
-  const confirmDeleteList = useCallback(() => {
-    if (deleteListConfirm) {
-      removeListFromAllTasks(deleteListConfirm.id);
-      deleteList(deleteListConfirm.id);
-      if (filter === deleteListConfirm.id) setFilter('all');
-      showToast('List deleted');
-      closeDeleteListConfirm();
-    }
-  }, [deleteListConfirm, filter, removeListFromAllTasks, deleteList, showToast, closeDeleteListConfirm]);
 
   return (
     <ThemedView style={styles.container}>
@@ -107,7 +65,7 @@ export default function TasksScreen() {
         filter={filter}
         lists={lists}
         onFilterChange={setFilter}
-        onListOptions={openListOptions}
+        onListOptions={listModals.openListOptions}
         onAddList={() => setAddListModalVisible(true)}
       />
 
@@ -148,31 +106,31 @@ export default function TasksScreen() {
       />
 
       <ListOptionsModal
-        visible={listOptionsList !== null}
-        list={listOptionsList}
-        onClose={closeListOptions}
-        onRename={openRenameList}
-        onDelete={openDeleteListConfirm}
+        visible={listModals.listOptionsList !== null}
+        list={listModals.listOptionsList}
+        onClose={listModals.closeListOptions}
+        onRename={listModals.openRenameList}
+        onDelete={listModals.openDeleteListConfirm}
       />
 
       <RenameListModal
-        visible={renameList !== null}
-        draft={renameDraft}
-        onDraftChange={setRenameDraft}
-        onClose={closeRenameList}
-        onSave={saveRenameList}
+        visible={listModals.renameList !== null}
+        draft={listModals.renameDraft}
+        onDraftChange={listModals.setRenameDraft}
+        onClose={listModals.closeRenameList}
+        onSave={listModals.saveRenameList}
       />
 
       <DeleteListConfirmModal
-        visible={deleteListConfirm !== null}
-        list={deleteListConfirm}
-        onClose={closeDeleteListConfirm}
-        onConfirm={confirmDeleteList}
+        visible={listModals.deleteListConfirm !== null}
+        list={listModals.deleteListConfirm}
+        onClose={listModals.closeDeleteListConfirm}
+        onConfirm={listModals.confirmDeleteList}
       />
 
       <Toast
-        visible={toast.visible}
-        message={toast.message}
+        visible={toastVisible}
+        message={toastMessage}
         onDismiss={dismissToast}
       />
     </ThemedView>
