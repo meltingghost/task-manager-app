@@ -1,3 +1,6 @@
+/**
+ * Holds filter state (tab, search, color) and returns filteredTasks and currentListId.
+ */
 import { useMemo, useState } from 'react';
 
 import type { Task } from '@/types/task';

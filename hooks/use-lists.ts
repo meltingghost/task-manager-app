@@ -1,3 +1,6 @@
+/**
+ * List CRUD (add, update, delete). In-memory state.
+ */
 import { useCallback, useState } from 'react';
 
 import type { List } from '@/types/list';

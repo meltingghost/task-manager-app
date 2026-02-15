@@ -1,3 +1,6 @@
+/**
+ * Toast visibility and message. Provides showToast and dismissToast.
+ */
 import { useCallback, useState } from 'react';
 
 export interface ToastState {

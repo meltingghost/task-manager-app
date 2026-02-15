@@ -1,3 +1,6 @@
+/**
+ * Modal to set display name and avatar icon. Used from header menu.
+ */
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import type { ComponentProps } from 'react';
 import { Keyboard, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';

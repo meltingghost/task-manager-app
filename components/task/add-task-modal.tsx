@@ -1,3 +1,6 @@
+/**
+ * Modal to create a task (title and color). Can pre-fill list when opened from a list tab.
+ */
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useCallback, useState } from 'react';
 import {

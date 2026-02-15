@@ -1,3 +1,7 @@
+/**
+ * Root layout: theme provider, auth guard, and stack navigator.
+ * AuthGuard redirects unauthenticated users to login and authenticated users from login to tabs.
+ */
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';

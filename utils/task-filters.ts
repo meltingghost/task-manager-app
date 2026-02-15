@@ -1,3 +1,6 @@
+/**
+ * Helpers for tab filter type, status/list filtering, and combined filterTasks used by the UI.
+ */
 import type { Task } from '@/types/task';
 
 export type TaskFilter = 'all' | 'active' | 'completed';

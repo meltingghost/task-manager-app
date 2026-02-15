@@ -1,3 +1,6 @@
+/**
+ * Flat list of tasks with incomplete-first ordering. Delegates each row to TaskItem.
+ */
 import { useCallback, useMemo } from 'react';
 import { FlatList, ListRenderItem, StyleSheet } from 'react-native';
 

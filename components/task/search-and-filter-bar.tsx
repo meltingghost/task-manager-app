@@ -1,3 +1,6 @@
+/**
+ * Search input and color filter button. Color filter opens a modal to pick a color or "All colors".
+ */
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, TextInput, useColorScheme, View } from 'react-native';

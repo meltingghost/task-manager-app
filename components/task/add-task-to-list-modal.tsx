@@ -1,3 +1,6 @@
+/**
+ * Modal to add or remove the current task to/from lists (toggle per list).
+ */
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Modal, Pressable, ScrollView, StyleSheet } from 'react-native';
 

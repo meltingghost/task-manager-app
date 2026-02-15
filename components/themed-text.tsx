@@ -1,3 +1,4 @@
+/** Theme-aware Text using useThemeColor for text color. */
 import { StyleSheet, Text, type TextProps } from 'react-native';
 
 import { useThemeColor } from '@/hooks/use-theme-color';

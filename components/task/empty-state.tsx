@@ -1,3 +1,6 @@
+/**
+ * Shown when there are no tasks.
+ */
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { StyleSheet, View } from 'react-native';
 

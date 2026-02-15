@@ -1,3 +1,6 @@
+/**
+ * Header with title pill and avatar. Avatar opens menu (profile, logout); profile modal for display name and icon.
+ */
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
 import type { ComponentProps } from 'react';

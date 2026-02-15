@@ -1,3 +1,6 @@
+/**
+ * Modal to rename the selected list.
+ */
 import { Keyboard, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';

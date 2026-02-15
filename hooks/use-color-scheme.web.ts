@@ -1,3 +1,6 @@
+/**
+ * useColorScheme for web: defers to client so static rendering is safe. Returns system light/dark.
+ */
 import { useEffect, useState } from 'react';
 import { useColorScheme as useRNColorScheme } from 'react-native';
 

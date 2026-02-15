@@ -1,4 +1,6 @@
-// eslint-disable-next-line import/no-unresolved -- AsyncStorage is a runtime dependency
+/**
+ * Auth state (isAuthenticated, isLoading) and signIn/signOut. Persists session with AsyncStorage.
+ */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 

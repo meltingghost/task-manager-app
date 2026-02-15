@@ -1,3 +1,6 @@
+/**
+ * Task CRUD and list assignment via a single useReducer. Reducer is pure; id generation happens in the hook.
+ */
 import { useCallback, useReducer } from 'react';
 
 import { TASK_COLORS } from '@/constants/theme';

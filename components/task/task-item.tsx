@@ -1,3 +1,6 @@
+/**
+ * Single task row: checkbox, title, edit, add-to-list, delete. Inline edit mode and two modals (add to list, delete confirm).
+ */
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Haptics from 'expo-haptics';
 import React, { useCallback, useMemo, useState } from 'react';

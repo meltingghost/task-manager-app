@@ -1,3 +1,6 @@
+/**
+ * Horizontal tabs for status (all/undone/done), one tab per list, and "Add list". Long-press on list tab opens options.
+ */
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Pressable, ScrollView, StyleSheet, useColorScheme } from 'react-native';
 

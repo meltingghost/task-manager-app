@@ -1,3 +1,6 @@
+/**
+ * Confirmation before deleting a task.
+ */
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';

@@ -1,3 +1,6 @@
+/**
+ * Reusable modal shell (overlay, title, children). Tap overlay to close.
+ */
 import type { ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 

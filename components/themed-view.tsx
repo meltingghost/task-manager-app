@@ -1,3 +1,4 @@
+/** Theme-aware View using useThemeColor for background. */
 import { View, type ViewProps } from 'react-native';
 
 import { useThemeColor } from '@/hooks/use-theme-color';

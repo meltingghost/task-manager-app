@@ -1,3 +1,6 @@
+/**
+ * Modal to create a new list (name only).
+ */
 import { useCallback, useState } from 'react';
 import {
   Keyboard,

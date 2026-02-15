@@ -1,3 +1,7 @@
+/**
+ * State and handlers for list-options → rename and list-options → delete flows.
+ * Resets the active tab when the current list is deleted.
+ */
 import { useCallback, useState } from 'react';
 import { Keyboard } from 'react-native';
 

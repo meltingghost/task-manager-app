@@ -1,3 +1,6 @@
+/**
+ * Login screen: email/password form and sign-in. Session is persisted via auth context (AsyncStorage).
+ */
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';

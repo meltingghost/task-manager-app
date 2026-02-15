@@ -1,3 +1,6 @@
+/**
+ * Confirmation before deleting a list. Tasks are removed from the list.
+ */
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';

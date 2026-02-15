@@ -1,3 +1,6 @@
+/**
+ * Options for a list (rename, delete). Opened from long-press on a list tab.
+ */
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Pressable, StyleSheet } from 'react-native';
 

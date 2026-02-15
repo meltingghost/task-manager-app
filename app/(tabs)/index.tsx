@@ -1,3 +1,7 @@
+/**
+ * Main Tasks screen. Composes useTasks, useLists, useToast, useTasksFilter, and useListModals,
+ * and renders the tab bar, search bar, task list, FAB, and all task/list modals.
+ */
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 

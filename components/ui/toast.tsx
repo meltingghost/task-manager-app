@@ -1,3 +1,6 @@
+/**
+ * Toast notification (message and dismiss). Used for success and feedback messages.
+ */
 import { useEffect } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
