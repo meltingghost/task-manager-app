@@ -144,8 +144,8 @@ export default function TasksScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 25,
-    paddingBottom: 25,
+    marginTop: 25,
+    marginBottom: 25,
   },
   listContainer: {
     flex: 1,

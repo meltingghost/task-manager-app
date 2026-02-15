@@ -1,15 +1,14 @@
 /**
- * Root layout: theme provider, auth guard, and stack navigator.
+ * Root layout: theme preference provider, auth guard, and stack navigator.
  * AuthGuard redirects unauthenticated users to login and authenticated users from login to tabs.
  */
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { AuthProvider, useAuth } from '@/contexts/auth-context';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { ThemePreferenceProvider } from '@/contexts/theme-preference-context';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -38,10 +37,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 }
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemePreferenceProvider>
       <AuthProvider>
         <AuthGuard>
           <Stack>
@@ -52,6 +49,6 @@ export default function RootLayout() {
         </AuthGuard>
       </AuthProvider>
       <StatusBar style="auto" />
-    </ThemeProvider>
+    </ThemePreferenceProvider>
   );
 }

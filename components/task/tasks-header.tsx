@@ -9,6 +9,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ProfileModal } from '@/components/task/profile-modal';
 import { useAuth } from '@/contexts/auth-context';
+import { useThemePreference } from '@/contexts/theme-preference-context';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 export interface TasksHeaderProps {
@@ -18,6 +19,7 @@ export interface TasksHeaderProps {
 export function TasksHeader({ onProfileSaved }: TasksHeaderProps = {}) {
   const router = useRouter();
   const { signOut } = useAuth();
+  const { preference, setPreference } = useThemePreference();
   const tintColor = useThemeColor({}, 'tint');
   const exitColor = useThemeColor({}, 'exit');
   const borderColor = useThemeColor({}, 'border');
@@ -92,6 +94,43 @@ export function TasksHeader({ onProfileSaved }: TasksHeaderProps = {}) {
               <MaterialIcons name="person" size={22} color={textColor} />
               <Text style={[styles.menuItemText, { color: textColor }]}>My Profile</Text>
             </Pressable>
+            <View style={[styles.themeSection, { borderTopColor: borderColor }]}>
+              <Text style={[styles.themeSectionLabel, { color: textColor }]}>Theme</Text>
+              {(['light', 'dark', 'system'] as const).map((option) => (
+                <Pressable
+                  key={option}
+                  style={({ pressed }) => [
+                    styles.themeOption,
+                    pressed && styles.menuItemPressed,
+                    preference === option && { backgroundColor: surfaceColor },
+                  ]}
+                  onPress={() => setPreference(option)}
+                >
+                  <MaterialIcons
+                    name={
+                      option === 'light'
+                        ? 'light-mode'
+                        : option === 'dark'
+                          ? 'dark-mode'
+                          : 'settings-brightness'
+                    }
+                    size={20}
+                    color={preference === option ? tintColor : textColor}
+                  />
+                  <Text
+                    style={[
+                      styles.themeOptionText,
+                      { color: preference === option ? tintColor : textColor },
+                    ]}
+                  >
+                    {option === 'light' ? 'Light' : option === 'dark' ? 'Dark' : 'System'}
+                  </Text>
+                  {preference === option && (
+                    <MaterialIcons name="check" size={20} color={tintColor} style={styles.themeCheck} />
+                  )}
+                </Pressable>
+              ))}
+            </View>
             <Pressable
               style={({ pressed }) => [styles.menuItem, pressed && styles.menuItemPressed]}
               onPress={() => {
@@ -189,5 +228,34 @@ const styles = StyleSheet.create({
   menuItemText: {
     fontSize: 16,
     fontWeight: '600',
+  },
+  themeSection: {
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    borderTopWidth: 1,
+  },
+  themeSectionLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+    marginLeft: 4,
+  },
+  themeOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  themeOptionText: {
+    fontSize: 15,
+    fontWeight: '500',
+    flex: 1,
+  },
+  themeCheck: {
+    marginLeft: 'auto',
   },
 });

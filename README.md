@@ -37,7 +37,7 @@ A task management app built with React Native (Expo). Add tasks, mark them compl
 - **Filters**: "Everything", "Undone", and "Done" tabs, plus one tab per custom list.
 - **Custom lists**: create lists from the "Add List" tab; long-press a list tab to rename or delete it.
 - **Search and color filter**: search by task title and filter by task color.
-- **Theme**: app follows the system light/dark theme.
+- **Theme**: choose **Light**, **Dark**, or **System** from the header user menu; the selection is saved and applied across the app.
 - **Login**: simple login screen; session is persisted so reloads do not log you out (logout only when you tap Logout).
 - **Profile**: set display name and avatar icon from the header menu; title shows "[Name]'s Tasks" when set.
 - **Haptic feedback**: when toggling tasks, deleting, and on supported devices.
@@ -76,7 +76,8 @@ components/
     └── toast.tsx
 
 contexts/
-└── auth-context.tsx      # Auth state + AsyncStorage persistence
+├── auth-context.tsx              # Auth state + AsyncStorage persistence
+└── theme-preference-context.tsx  # Light / dark / system theme + AsyncStorage persistence
 
 hooks/
 ├── use-color-scheme.ts
