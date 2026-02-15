@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   TextInput,
   View,
@@ -57,69 +58,75 @@ export default function LoginScreen() {
     <ThemedView style={styles.container}>
       <KeyboardAvoidingView
         style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
       >
-        <View style={styles.content}>
-          <View style={[styles.logoWrap, { backgroundColor: surfaceColor }]}>
-            <MaterialIcons name="assignment" size={48} color={tintColor} />
-          </View>
-          <ThemedText type="title" style={styles.title}>
-            Welcome back
-          </ThemedText>
-          <ThemedText style={[styles.subtitle, { color: iconColor }]}>
-            Sign in to continue to your tasks
-          </ThemedText>
-
-          <View style={[styles.card, { backgroundColor: cardBg, borderColor }]}>
-            <ThemedText style={[styles.label, { color: iconColor }]}>Email</ThemedText>
-            <TextInput
-              style={[
-                styles.input,
-                { color: textColor, borderColor: emailInvalid ? exitColor : borderColor },
-              ]}
-              placeholder="you@example.com"
-              placeholderTextColor={iconColor}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              accessibilityLabel="Email"
-            />
-            {emailInvalid && (
-              <ThemedText style={[styles.errorText, { color: exitColor }]}>
-                Please enter a valid email address
-              </ThemedText>
-            )}
-            <ThemedText style={[styles.label, { color: iconColor, marginTop: 16 }]}>
-              Password
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.content}>
+            <View style={[styles.logoWrap, { backgroundColor: surfaceColor }]}>
+              <MaterialIcons name="assignment" size={48} color={tintColor} />
+            </View>
+            <ThemedText type="title" style={styles.title}>
+              Welcome back
             </ThemedText>
-            <TextInput
-              style={[styles.input, { color: textColor, borderColor }]}
-              placeholder="Enter your password"
-              placeholderTextColor={iconColor}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              accessibilityLabel="Password"
-            />
-            <Pressable
-              onPress={handleSignIn}
-              disabled={!canSubmit}
-              style={({ pressed }) => [
-                styles.button,
-                { backgroundColor: tintColor },
-                !canSubmit && styles.buttonDisabled,
-                pressed && styles.pressed,
-              ]}
-              accessibilityLabel="Sign in"
-              accessibilityRole="button"
-            >
-              <ThemedText style={styles.buttonText}>Sign in</ThemedText>
-            </Pressable>
+            <ThemedText style={[styles.subtitle, { color: iconColor }]}>
+              Sign in to continue to your tasks
+            </ThemedText>
+
+            <View style={[styles.card, { backgroundColor: cardBg, borderColor }]}>
+              <ThemedText style={[styles.label, { color: iconColor }]}>Email</ThemedText>
+              <TextInput
+                style={[
+                  styles.input,
+                  { color: textColor, borderColor: emailInvalid ? exitColor : borderColor },
+                ]}
+                placeholder="you@example.com"
+                placeholderTextColor={iconColor}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                accessibilityLabel="Email"
+              />
+              {emailInvalid && (
+                <ThemedText style={[styles.errorText, { color: exitColor }]}>
+                  Please enter a valid email address
+                </ThemedText>
+              )}
+              <ThemedText style={[styles.label, { color: iconColor, marginTop: 16 }]}>
+                Password
+              </ThemedText>
+              <TextInput
+                style={[styles.input, { color: textColor, borderColor }]}
+                placeholder="Enter your password"
+                placeholderTextColor={iconColor}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                accessibilityLabel="Password"
+              />
+              <Pressable
+                onPress={handleSignIn}
+                disabled={!canSubmit}
+                style={({ pressed }) => [
+                  styles.button,
+                  { backgroundColor: tintColor },
+                  !canSubmit && styles.buttonDisabled,
+                  pressed && styles.pressed,
+                ]}
+                accessibilityLabel="Sign in"
+                accessibilityRole="button"
+              >
+                <ThemedText style={styles.buttonText}>Sign in</ThemedText>
+              </Pressable>
+            </View>
           </View>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </ThemedView>
   );
@@ -131,8 +138,12 @@ const styles = StyleSheet.create({
   },
   keyboardView: {
     flex: 1,
-    justifyContent: 'center',
     paddingHorizontal: 24,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingVertical: 24,
   },
   content: {
     alignItems: 'center',
