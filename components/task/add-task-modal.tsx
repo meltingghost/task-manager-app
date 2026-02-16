@@ -61,7 +61,7 @@ export function AddTaskModal({ visible, onClose, onSubmit, onTaskAdded }: AddTas
         style={styles.overlay}
         onPress={handleClose}
         accessibilityLabel="Close modal"
-        accessibilityRole="button"
+        accessibilityRole="none"
       >
         <Pressable
           style={[styles.content, { backgroundColor: cardBg, borderColor }]}

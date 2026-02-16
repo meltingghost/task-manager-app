@@ -58,7 +58,7 @@ export function ProfileModal({
         style={styles.overlay}
         onPress={handleClose}
         accessibilityLabel="Close modal"
-        accessibilityRole="button"
+        accessibilityRole="none"
       >
         <Pressable
           style={[styles.card, { backgroundColor: cardBg, borderColor }]}

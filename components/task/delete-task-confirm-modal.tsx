@@ -34,7 +34,7 @@ export function DeleteTaskConfirmModal({
         style={styles.overlay}
         onPress={onClose}
         accessibilityLabel="Close modal"
-        accessibilityRole="button"
+        accessibilityRole="none"
       >
         <Pressable
           style={[styles.card, { backgroundColor: cardBg, borderColor }]}

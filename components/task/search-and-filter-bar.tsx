@@ -73,7 +73,7 @@ export function SearchAndFilterBar({
           style={[styles.colorModalOverlay, { backgroundColor: overlayBg }]}
           onPress={() => setColorModalVisible(false)}
           accessibilityLabel="Close modal"
-          accessibilityRole="button"
+          accessibilityRole="none"
         >
           <View style={[styles.colorModalContent, { backgroundColor: cardBg, borderColor }]}>
             <ThemedText style={styles.colorModalTitle}>Filter by color</ThemedText>

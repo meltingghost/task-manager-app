@@ -30,7 +30,7 @@ export function BaseModal({ visible, onClose, title, children }: BaseModalProps)
         style={styles.overlay}
         onPress={onClose}
         accessibilityLabel="Close modal"
-        accessibilityRole="button"
+        accessibilityRole="none"
       >
         <Pressable
           style={[styles.card, { backgroundColor: cardBg, borderColor }]}
