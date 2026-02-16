@@ -20,7 +20,7 @@ export interface TaskListProps {
   lists: List[];
   onToggleCompletion: (id: string) => void;
   onDelete: (id: string) => void;
-  onUpdate?: (id: string, title: string) => void;
+  onUpdate?: (id: string, title: string, color?: string) => void;
   onAddTaskToList: (taskId: string, listId: string) => void;
   onRemoveTaskFromList: (taskId: string, listId: string) => void;
   onShowToast?: (message: string) => void;

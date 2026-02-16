@@ -19,6 +19,7 @@ type TasksAction =
   | { type: 'TOGGLE_TASK_COMPLETION'; payload: { taskId: string } }
   | { type: 'DELETE_TASK'; payload: { taskId: string } }
   | { type: 'UPDATE_TASK_TITLE'; payload: { taskId: string; title: string } }
+  | { type: 'UPDATE_TASK'; payload: { taskId: string; title?: string; color?: string } }
   | { type: 'ADD_TASK_TO_LIST'; payload: { taskId: string; listId: string } }
   | { type: 'REMOVE_TASK_FROM_LIST'; payload: { taskId: string; listId: string } }
   | { type: 'REMOVE_LIST_FROM_ALL_TASKS'; payload: { listId: string } };
@@ -48,6 +49,16 @@ function tasksReducer(state: Task[], action: TasksAction): Task[] {
       return state.map((t) =>
         t.id === taskId ? { ...t, title: trimmed } : t
       );
+    }
+    case 'UPDATE_TASK': {
+      const { taskId, title, color } = action.payload;
+      return state.map((t) => {
+        if (t.id !== taskId) return t;
+        let next = { ...t };
+        if (title !== undefined && title.trim() !== '') next = { ...next, title: title.trim() };
+        if (color !== undefined) next = { ...next, color };
+        return next;
+      });
     }
     case 'ADD_TASK_TO_LIST': {
       const { taskId, listId } = action.payload;
@@ -109,8 +120,12 @@ export function useTasks() {
     dispatch({ type: 'DELETE_TASK', payload: { taskId } });
   }, []);
 
-  const updateTask = useCallback((taskId: string, title: string) => {
-    dispatch({ type: 'UPDATE_TASK_TITLE', payload: { taskId, title } });
+  const updateTask = useCallback((taskId: string, title: string, color?: string) => {
+    if (color !== undefined) {
+      dispatch({ type: 'UPDATE_TASK', payload: { taskId, title, color } });
+    } else {
+      dispatch({ type: 'UPDATE_TASK_TITLE', payload: { taskId, title } });
+    }
   }, []);
 
   const addTaskToList = useCallback((taskId: string, listId: string) => {

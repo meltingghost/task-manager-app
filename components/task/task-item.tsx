@@ -3,8 +3,8 @@
  */
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Haptics from 'expo-haptics';
-import React, { useCallback, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { AddTaskToListModal } from '@/components/task/add-task-to-list-modal';
@@ -22,7 +22,7 @@ export interface TaskItemProps {
   lists: List[];
   onToggleCompletion: (id: string) => void;
   onDelete: (id: string) => void;
-  onUpdate?: (id: string, title: string) => void;
+  onUpdate?: (id: string, title: string, color?: string) => void;
   onAddTaskToList: (taskId: string, listId: string) => void;
   onRemoveTaskFromList: (taskId: string, listId: string) => void;
   onShowToast?: (message: string) => void;
@@ -45,8 +45,16 @@ function TaskItemComponent({
 
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(task.title);
+  const [editColor, setEditColor] = useState(task.color ?? defaultTaskColor);
   const [listModalVisible, setListModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+
+  useEffect(() => {
+    if (isEditing) {
+      setEditValue(task.title);
+      setEditColor(task.color ?? defaultTaskColor);
+    }
+  }, [isEditing, task.title, task.color]);
 
   const taskListIds = useMemo(() => task.listIds ?? [], [task.listIds]);
 
@@ -76,17 +84,20 @@ function TaskItemComponent({
   }, [task.id, onDelete, closeDeleteModal, onShowToast]);
 
   const handleSaveEdit = useCallback(() => {
-    if (onUpdate && editValue.trim() !== task.title) {
-      onUpdate(task.id, editValue.trim());
+    const trimmed = editValue.trim();
+    if (onUpdate && (trimmed !== task.title || editColor !== (task.color ?? defaultTaskColor))) {
+      onUpdate(task.id, trimmed || task.title, editColor);
     }
     setEditValue(task.title);
+    setEditColor(task.color ?? defaultTaskColor);
     setIsEditing(false);
-  }, [onUpdate, task.id, task.title, editValue]);
+  }, [onUpdate, task.id, task.title, task.color, editValue, editColor]);
 
   const handleCancelEdit = useCallback(() => {
     setEditValue(task.title);
+    setEditColor(task.color ?? defaultTaskColor);
     setIsEditing(false);
-  }, [task.title]);
+  }, [task.title, task.color]);
 
   const handleToggleCompletion = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -97,18 +108,44 @@ function TaskItemComponent({
 
   if (isEditing && onUpdate) {
     return (
-      <View style={[styles.row, styles.rowBorder, { borderBottomColor: borderColor }]}>
-        <View style={[styles.colorBar, { backgroundColor: taskColor }]} />
-        <TextInput
-          style={[styles.input, { color: textColor }]}
-          value={editValue}
-          onChangeText={setEditValue}
-          onSubmitEditing={handleSaveEdit}
-          onBlur={handleSaveEdit}
-          autoFocus
-          accessibilityLabel="Edit task title"
-          accessibilityRole="none"
-        />
+      <View style={[styles.row, styles.rowBorder, styles.editRow, { borderBottomColor: borderColor }]}>
+        <View style={[styles.colorBar, { backgroundColor: editColor }]} />
+        <View style={styles.editContent}>
+          <TextInput
+            style={[styles.input, { color: textColor }]}
+            value={editValue}
+            onChangeText={setEditValue}
+            onSubmitEditing={handleSaveEdit}
+            autoFocus
+            accessibilityLabel="Edit task title"
+            accessibilityRole="none"
+          />
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.colorScroll}
+            contentContainerStyle={styles.colorRow}
+          >
+            {TASK_COLORS.map(({ hex }) => (
+              <Pressable
+                key={hex}
+                onPress={() => setEditColor(hex)}
+                style={[
+                  styles.colorChip,
+                  { backgroundColor: hex },
+                  editColor === hex && styles.colorChipSelected,
+                  editColor === hex && { borderColor: tintColor },
+                ]}
+                accessibilityLabel={`Select color ${hex}`}
+                accessibilityRole="button"
+              >
+                {editColor === hex && (
+                  <MaterialIcons name="check" size={16} color="#333" />
+                )}
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
         <Pressable
           onPress={handleSaveEdit}
           style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
@@ -255,5 +292,34 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 0,
     minWidth: 0,
+  },
+  editRow: {
+    flexWrap: 'wrap',
+  },
+  editContent: {
+    flex: 1,
+    minWidth: 0,
+    gap: 8,
+  },
+  colorScroll: {
+    marginTop: 6,
+    marginBottom: 2,
+  },
+  colorRow: {
+    flexDirection: 'row',
+    gap: 8,
+    paddingRight: 8,
+  },
+  colorChip: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  colorChipSelected: {
+    borderWidth: 3,
   },
 });
